@@ -23,6 +23,7 @@ const fsx = require('./helpers/fsx')
 const decryptKeyValue = require('./helpers/cryptography/decryptKeyValue')
 const Errors = require('./helpers/errors')
 const normalizeDotenvConfigQuiet = require('./helpers/normalizeDotenvConfigQuiet')
+const normalizeDotenvConfigConvention = require('./helpers/normalizeDotenvConfigConvention')
 
 function uniqueInjectedKeys (processedEnvs) {
   const result = new Set()
@@ -37,6 +38,7 @@ function uniqueInjectedKeys (processedEnvs) {
 /** @type {import('./main').config} */
 const config = function (options = {}) {
   options = normalizeDotenvConfigQuiet(options)
+  options = normalizeDotenvConfigConvention(options)
 
   // allow user to set processEnv to write to
   let processEnv = process.env
@@ -300,6 +302,8 @@ const set = async function (key, value, options = {}) {
 
 /* @type {import('./main').get} */
 const get = async function (key, options = {}) {
+  options = normalizeDotenvConfigConvention(options)
+
   const envs = buildEnvs(options)
   const noArmor = resolveNoArmor(options)
 
