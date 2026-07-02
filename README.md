@@ -1319,6 +1319,14 @@ $ dotenvx run --convention=nextjs -- node index.js
 Hello development local
 ```
 
+You can also set `DOTENV_CONFIG_CONVENTION=nextjs`.
+
+```sh
+$ DOTENV_CONFIG_CONVENTION=nextjs dotenvx run -- node index.js
+[dotenvx@1.X.X] injecting env (1) from .env.development.local, .env.local, .env.development, .env
+Hello development local
+```
+
 (more conventions available upon request)
 
 </details>
@@ -1334,6 +1342,14 @@ $ echo "HELLO=env" > .env
 $ echo "console.log('Hello ' + process.env.HELLO)" > index.js
 
 $ NODE_ENV=development dotenvx run --convention=flow -- node index.js 
+[dotenvx@1.X.X] injecting env (1) from .env.development.local, .env.development, .env.local, .env
+Hello development local
+```
+
+You can also set `DOTENV_CONFIG_CONVENTION=flow`.
+
+```sh
+$ NODE_ENV=development DOTENV_CONFIG_CONVENTION=flow dotenvx run -- node index.js
 [dotenvx@1.X.X] injecting env (1) from .env.development.local, .env.development, .env.local, .env
 Hello development local
 ```
@@ -1468,6 +1484,13 @@ $ dotenvx get HELLO --convention=nextjs
 development local
 ```
 
+You can also set `DOTENV_CONFIG_CONVENTION=nextjs`.
+
+```sh
+$ DOTENV_CONFIG_CONVENTION=nextjs dotenvx get HELLO
+development local
+```
+
 </details>
 <details><summary>`get KEY --convention=flow`</summary><br>
 
@@ -1481,6 +1504,13 @@ $ echo "HELLO=env" > .env
 $ echo "console.log('Hello ' + process.env.HELLO)" > index.js
 
 $ NODE_ENV=development dotenvx get HELLO --convention=flow
+development local
+```
+
+You can also set `DOTENV_CONFIG_CONVENTION=flow`.
+
+```sh
+$ NODE_ENV=development DOTENV_CONFIG_CONVENTION=flow dotenvx get HELLO
 development local
 ```
 
@@ -2566,6 +2596,12 @@ This is equivalent to using `--convention=nextjs` with the CLI:
 
 ```sh
 $ dotenvx run --convention=nextjs -- node index.js
+```
+
+You can also set `DOTENV_CONFIG_CONVENTION=nextjs`.
+
+```sh
+$ DOTENV_CONFIG_CONVENTION=nextjs node index.js
 ```
 
 </details>

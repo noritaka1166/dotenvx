@@ -8,6 +8,7 @@ const createSpinner = require('../../lib/helpers/createSpinner')
 const Session = require('../../db/session')
 const normalizeArmorAliases = require('./normalizeArmorAliases')
 const normalizeDotenvConfigQuiet = require('../../lib/helpers/normalizeDotenvConfigQuiet')
+const normalizeDotenvConfigConvention = require('../../lib/helpers/normalizeDotenvConfigConvention')
 
 const conventions = require('./../../lib/helpers/conventions')
 const { determine } = require('./../../lib/helpers/envResolution')
@@ -46,7 +47,7 @@ function uniqueInjectedKeys (processedEnvs) {
 }
 
 async function run () {
-  const options = normalizeDotenvConfigQuiet(normalizeArmorAliases(this.opts()))
+  const options = normalizeDotenvConfigConvention(normalizeDotenvConfigQuiet(normalizeArmorAliases(this.opts())))
 
   let commandArgs = this.args
   if (commandArgs.length < 1) {
