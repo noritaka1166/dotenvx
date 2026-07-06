@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.1.4...main)
+[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.1.5...main)
+
+## [2.1.5](https://github.com/dotenvx/dotenvx/compare/v2.1.4...v2.1.5) (2026-07-06)
+
+### Changed
+
+* `precommit` and `prebuild` respect `_PLAIN` ([#871](https://github.com/dotenvx/dotenvx/pull/871))
 
 ## [2.1.4](https://github.com/dotenvx/dotenvx/compare/v2.1.3...v2.1.4) (2026-07-02)
 

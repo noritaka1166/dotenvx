@@ -87,6 +87,32 @@ t.test('#run (dockerignore is not ignore .env.production file and should)', ct =
   ct.end()
 })
 
+t.test('#run (_PLAIN keys are safe when other values are encrypted)', ct => {
+  sinon.stub(fsx, 'existsSync').returns(true)
+  sinon.stub(Prebuild.prototype, '_filepaths').returns(['.env.production'])
+  childProcess.execSync.returns(Buffer.from('.env.production'))
+  const readFileXStub = sinon.stub(fsx, 'readFileXSync')
+  readFileXStub.callsFake((filePath) => {
+    if (filePath === '.env') {
+      return '.env'
+    } else if (filePath === '.env.production') {
+      return [
+        'DOTENV_PUBLIC_KEY="123"',
+        'SECRET="encrypted:abc123"',
+        'SOMETHING_PLAIN="safe"'
+      ].join('\n')
+    }
+    return ''
+  })
+
+  const result = new Prebuild().run()
+
+  ct.same(result.successMessage, '▣ encrypted/dockerignored (1)')
+  ct.same(result.warnings, [])
+
+  ct.end()
+})
+
 t.test('#run (dockerignore is not ignore .env.keys file and should)', ct => {
   sinon.stub(fsx, 'existsSync').returns(true)
   sinon.stub(Prebuild.prototype, '_filepaths').returns(['.env.keys'])
