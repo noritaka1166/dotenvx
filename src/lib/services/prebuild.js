@@ -5,26 +5,9 @@ const ignore = require('ignore')
 
 const ls = require('../resolvers/ls')
 const Errors = require('../helpers/errors')
-const { encrypted, scan } = require('@dotenvx/primitives')
-const { isDotenvPublicKey, isPlainKey } = require('../helpers/cryptography')
+const { sealed } = require('@dotenvx/primitives')
 
 const MISSING_DOCKERIGNORE = '.env.keys' // by default only ignore .env.keys. all other .env* files COULD be included - as long as they are encrypted
-
-function sealed (src) {
-  const { parsed } = scan(src)
-  for (const [name, values] of Object.entries(parsed)) {
-    if (isDotenvPublicKey(name) || isPlainKey(name)) {
-      continue
-    }
-
-    for (const value of values) {
-      if (!encrypted(value)) {
-        return false
-      }
-    }
-  }
-  return true
-}
 
 class Prebuild {
   constructor (directory = './') {
