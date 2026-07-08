@@ -1396,6 +1396,82 @@ $ dotenvx run --no-armor -- yourcommand
 `--no-vlt` and `--no-ops` are deprecated aliases.
 
 </details>
+<details><summary>`keychain`</summary><br>
+
+Move private keys into macOS Keychain so `.env.keys` does not have to keep the private key on disk.
+
+```sh
+$ dotenvx keychain up
+```
+
+Use `down` to move the private key back into `.env.keys`.
+
+```sh
+$ dotenvx keychain down
+```
+
+Use `push` and `pull` when you want to copy the key without removing it from the source.
+
+```sh
+$ dotenvx keychain push
+$ dotenvx keychain pull
+```
+
+Specify files with `-f` and `-fk`.
+
+```sh
+$ dotenvx keychain up -f .env.production -fk .env.keys
+```
+
+Currently supported on macOS.
+
+</details>
+<details><summary>`--no-keychain`</summary><br>
+
+Turn off macOS Keychain lookups.
+
+```sh
+$ dotenvx run --no-keychain -- yourcommand
+$ dotenvx get HELLO --no-keychain
+```
+
+</details>
+<details><summary>`armor`</summary><br>
+
+Move private keys into [Dotenvx Armor ⛨](https://dotenvx.com/armor) for off-device storage, sharing with your team, and audited access.
+
+```sh
+$ dotenvx login
+$ dotenvx armor up
+```
+
+Use `down` to move the private key back into `.env.keys`.
+
+```sh
+$ dotenvx armor down
+```
+
+Use `push` and `pull` when you want to copy the key without removing it from the source.
+
+```sh
+$ dotenvx armor push
+$ dotenvx armor pull
+```
+
+Move an armored key to another team with `move`.
+
+```sh
+$ dotenvx armor move --team acme
+```
+
+Armor commands accept `-f`, `--token`, and `--team` where supported.
+
+```sh
+$ dotenvx armor up -f .env.production --team acme
+$ dotenvx armor pull -f .env.production --token "$DOTENVX_ARMOR_TOKEN"
+```
+
+</details>
 <details><summary>`get KEY`</summary><br>
 
 Return a single environment variable's value.
