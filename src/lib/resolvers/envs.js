@@ -235,7 +235,7 @@ async function envs (options = {}) {
   const readableFilepaths = new Set()
   const processEnv = options.processEnv || process.env
   const envKeysFilepath = options.envKeysFilepath || options.envKeysFile || null
-  const provider = options.noArmor ? null : await providers(options)
+  const provider = await providers(options)
 
   for (const env of options.envs || []) {
     if (env.type === TYPE_ENV_FILE) {
@@ -269,7 +269,7 @@ function envsSync (options = {}) {
   const readableFilepaths = new Set()
   const processEnv = options.processEnv || process.env
   const envKeysFilepath = options.envKeysFilepath || options.envKeysFile || null
-  const provider = options.noArmor ? null : providers.sync(options)
+  const provider = providers.sync(options)
 
   for (const env of options.envs || []) {
     if (env.type === TYPE_ENV_FILE) {

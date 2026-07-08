@@ -22,7 +22,7 @@ async function decrypt (options = {}) {
   const ik = options.ik
   const ek = options.ek
   const fk = options.fk
-  const provider = options.noArmor ? null : await providers(options)
+  const provider = await providers(options)
 
   const processedEnvs = []
   const changedFilepaths = []
