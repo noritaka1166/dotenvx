@@ -1402,7 +1402,6 @@ Turn off macOS Keychain lookups.
 
 ```sh
 $ dotenvx run --no-keychain -- yourcommand
-$ dotenvx get HELLO --no-keychain
 ```
 
 </details>
@@ -1415,6 +1414,15 @@ $ echo "HELLO=Dotenvx" > .env
 
 $ dotenvx get HELLO
 World
+```
+
+</details>
+<details><summary>`get KEY --no-keychain`</summary><br>
+
+Turn off macOS Keychain lookups for get.
+
+```sh
+$ dotenvx get HELLO --no-keychain
 ```
 
 </details>
@@ -1733,6 +1741,15 @@ set HELLO_PLAIN (.env)
 Keys ending in `_PLAIN` are not encrypted by `dotenvx set` or `dotenvx encrypt`.
 
 </details>
+<details><summary>`set KEY value --no-keychain`</summary><br>
+
+Turn off macOS Keychain lookups for set.
+
+```sh
+$ dotenvx set HELLO Dotenvx --no-keychain
+```
+
+</details>
 <details><summary>`encrypt`</summary><br>
 
 Encrypt the contents of a `.env` file to an encrypted `.env` file.
@@ -1774,6 +1791,16 @@ $ dotenvx encrypt --no-armor
 ```
 
 `--no-vlt` and `--no-ops` are deprecated aliases.
+
+</details>
+<details><summary>`encrypt --no-keychain`</summary><br>
+
+Turn off macOS Keychain lookups for encrypt.
+
+```sh
+$ dotenvx encrypt --no-keychain
+◈ encrypted (.env)
+```
 
 </details>
 <details><summary>`encrypt -fk`</summary><br>
@@ -1895,6 +1922,16 @@ $ dotenvx decrypt
 ```
 
 </details>
+<details><summary>`decrypt --no-keychain`</summary><br>
+
+Turn off macOS Keychain lookups for decrypt.
+
+```sh
+$ dotenvx decrypt --no-keychain
+◇ decrypted (.env)
+```
+
+</details>
 <details><summary>`decrypt -f`</summary><br>
 
 Decrypt the contents of a specified encrypted `.env` file to an unencrypted `.env` file.
@@ -2002,6 +2039,16 @@ $ echo "HELLO=Dotenvx" > .env
 $ dotenvx encrypt
 
 $ dotenvx keypair
+{"DOTENV_PUBLIC_KEY":"<publicKey>","DOTENV_PRIVATE_KEY":"<privateKey>"}
+```
+
+</details>
+<details><summary>`keypair --no-keychain`</summary><br>
+
+Turn off macOS Keychain lookups for keypair.
+
+```sh
+$ dotenvx keypair --no-keychain
 {"DOTENV_PUBLIC_KEY":"<publicKey>","DOTENV_PRIVATE_KEY":"<privateKey>"}
 ```
 
