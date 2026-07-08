@@ -23,7 +23,24 @@ class KeychainDown {
     } = keynames(envFile)
 
     const publicKey = readEnvKey(publicKeyName, envFile, { strict: true, ignore: ['MISSING_PRIVATE_KEY'] })
-    const privateKey = execFileSync(SECURITY_BIN, ['find-generic-password', '-s', SERVICE, '-a', publicKey, '-w'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    let privateKey
+
+    try {
+      privateKey = execFileSync(SECURITY_BIN, ['find-generic-password', '-s', SERVICE, '-a', publicKey, '-w'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    } catch (error) {
+      privateKey = readEnvKey(privateKeyName, envKeysFile, { strict: false })
+
+      if (privateKey) {
+        return {
+          changed: false,
+          privateKeyName,
+          privateKeyValue: privateKey,
+          publicKeyValue: publicKey
+        }
+      }
+
+      throw error
+    }
 
     upsertEnvKey(privateKeyName, privateKey, envKeysFile)
     execFileSync(SECURITY_BIN, ['delete-generic-password', '-s', SERVICE, '-a', publicKey], { stdio: 'ignore' })

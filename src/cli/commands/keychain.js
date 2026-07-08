@@ -21,6 +21,22 @@ function configureKeychainCommand (keychain) {
     .option('-fk, --env-keys-file <path>', 'path to your .env.keys file', '.env.keys')
     .action(downAction)
 
+  const pushAction = require('./../actions/keychain/push')
+  keychain
+    .command('push')
+    .description('push key to macOS Keychain from .env.keys')
+    .option('-f, --env-file <path>', 'path to your env file')
+    .option('-fk, --env-keys-file <path>', 'path to your .env.keys file', '.env.keys')
+    .action(pushAction)
+
+  const pullAction = require('./../actions/keychain/pull')
+  keychain
+    .command('pull')
+    .description('pull key from macOS Keychain into .env.keys')
+    .option('-f, --env-file <path>', 'path to your env file')
+    .option('-fk, --env-keys-file <path>', 'path to your .env.keys file', '.env.keys')
+    .action(pullAction)
+
   return keychain
 }
 

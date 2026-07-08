@@ -2,12 +2,13 @@ const { execFileSync } = require('child_process')
 
 const keynames = require('../conventions/keynames')
 const readEnvKey = require('../helpers/readEnvKey')
+const upsertEnvKey = require('../helpers/upsertEnvKey')
 const armoredKeyDisplay = require('../helpers/armoredKeyDisplay')
 
 const SECURITY_BIN = '/usr/bin/security'
 const SERVICE = 'dotenvx'
 
-class KeychainUp {
+class KeychainPull {
   constructor (envFile = '.env', envKeysFile = '.env.keys') {
     this.envFile = envFile
     this.envKeysFile = envKeysFile
@@ -23,28 +24,18 @@ class KeychainUp {
     } = keynames(envFile)
 
     const publicKey = readEnvKey(publicKeyName, envFile, { strict: true, ignore: ['MISSING_PRIVATE_KEY'] })
-    const privateKey = readEnvKey(privateKeyName, envKeysFile, { strict: true })
-    const label = `dotenvx (${armoredKeyDisplay(publicKey)})`
+    let privateKey
 
     try {
-      const existingPrivateKey = execFileSync(SECURITY_BIN, ['find-generic-password', '-s', SERVICE, '-a', publicKey, '-w'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+      privateKey = execFileSync(SECURITY_BIN, ['find-generic-password', '-s', SERVICE, '-a', publicKey, '-w'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+    } catch {
+      throw new Error(`[NOT_FOUND] private key not found in macOS Keychain (${armoredKeyDisplay(publicKey)}). fix: [dotenvx keychain up]`)
+    }
 
-      if (existingPrivateKey === privateKey) {
-        return {
-          changed: false,
-          label,
-          privateKeyName,
-          privateKeyValue: privateKey,
-          publicKeyValue: publicKey
-        }
-      }
-    } catch {}
-
-    execFileSync(SECURITY_BIN, ['add-generic-password', '-U', '-s', SERVICE, '-a', publicKey, '-l', label, '-w', privateKey], { stdio: 'ignore' })
+    const result = upsertEnvKey(privateKeyName, privateKey, envKeysFile)
 
     return {
-      changed: true,
-      label,
+      changed: result.changed,
       privateKeyName,
       privateKeyValue: privateKey,
       publicKeyValue: publicKey
@@ -52,4 +43,4 @@ class KeychainUp {
   }
 }
 
-module.exports = KeychainUp
+module.exports = KeychainPull
