@@ -40,8 +40,10 @@ jobs:
         with:
           node-version: 20.x
       - name: install shellspec
-        run: curl -sfSL https://git.io/shellspec | sh -s 0.28.1 --yes
-      - run: which shellspec
+        run: |
+          curl -sfSL https://git.io/shellspec | sh -s 0.28.1 --yes --prefix "$RUNNER_TEMP/shellspec"
+          echo "$RUNNER_TEMP/shellspec/bin" >> "$GITHUB_PATH"
+      - run: shellspec --version
       - run: npm install
       - run: npm test
       - run: npm run testshell
