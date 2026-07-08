@@ -2520,24 +2520,6 @@ X.X.X
 
 </details>
 
-### Utilities
-
-Additional workflow helpers.
-
-<details><summary>`ext scan`</summary><br>
-
-Scan for leaked secrets.
-
-```sh
-$ dotenvx ext scan
-100 commits scanned.
-no leaks found
-```
-
-Uses [gitleaks](https://gitleaks.io) under the hood.
-
-</details>
-
 ### Library 📦
 
 Use dotenvx directly in code.
