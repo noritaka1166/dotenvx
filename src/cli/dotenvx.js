@@ -268,7 +268,7 @@ program.command('help [command]')
 // dotenvx armor
 program.addHelpText('after', ' ')
 program.addHelpText('after', 'Professional Security: ')
-program.addHelpText('after', '  lock                     ⛨ lock private keys with a local passphrase')
+program.addHelpText('after', '  lock                     ⊡ lock private keys with a local passphrase')
 program.addHelpText('after', '  keychain                 ⌥ move private keys into local macOS Keychain')
 program.addHelpText('after', '  armor                    ⛨ move private keys into Dotenvx Armor [www.dotenvx.com/armor]')
 

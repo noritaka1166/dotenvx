@@ -7,6 +7,7 @@ const ISSUE_BY_CODE = {
   DANGEROUS_DEPENDENCY_HOIST: 'https://github.com/dotenvx/dotenvx/issues/622',
   INVALID_COLOR: 'must be 256 colors',
   INVALID_CONVENTION: 'https://github.com/dotenvx/dotenvx/issues/761',
+  INVALID_PASSPHRASE: 'try again with the correct passphrase',
   INVALID_PRIVATE_KEY: 'https://github.com/dotenvx/dotenvx/issues/465',
   INVALID_PUBLIC_KEY: 'https://github.com/dotenvx/dotenvx/issues/756',
   MALFORMED_ENCRYPTED_DATA: 'https://github.com/dotenvx/dotenvx/issues/467',
@@ -148,6 +149,18 @@ class Errors {
   invalidPublicKey () {
     const code = 'INVALID_PUBLIC_KEY'
     const message = `[${code}] could not encrypt using public key '${this.publicKeyName}=${truncate(this.publicKey)}'`
+    const help = `fix: [${ISSUE_BY_CODE[code]}]`
+
+    const e = new Error(message)
+    e.code = code
+    e.help = help
+    e.messageWithHelp = `${message}. ${help}`
+    return e
+  }
+
+  invalidPassphrase () {
+    const code = 'INVALID_PASSPHRASE'
+    const message = `[${code}] could not unlock ${this.privateKeyName || 'DOTENV_PRIVATE_KEY'} using passphrase`
     const help = `fix: [${ISSUE_BY_CODE[code]}]`
 
     const e = new Error(message)
