@@ -268,11 +268,15 @@ program.command('help [command]')
 // dotenvx armor
 program.addHelpText('after', ' ')
 program.addHelpText('after', 'Professional Security: ')
-program.addHelpText('after', '  keychain                 ⌥ move private keys into macOS Keychain')
+program.addHelpText('after', '  lock                     ⛨ lock private keys with a local passphrase')
+program.addHelpText('after', '  keychain                 ⌥ move private keys into local macOS Keychain')
 program.addHelpText('after', '  armor                    ⛨ move private keys into Dotenvx Armor [www.dotenvx.com/armor]')
 
 // dotenvx keychain
 require('./commands/keychain')(program.command('keychain', { hidden: true }))
+
+// dotenvx lock
+require('./commands/lock')(program.command('lock', { hidden: true }))
 
 // dotenvx armor
 require('./commands/armor')(program.command('armor', { hidden: true }))

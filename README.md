@@ -2332,7 +2332,7 @@ Currently supported on macOS.
 </details>
 <details><summary>`keychain up`</summary><br>
 
-Move a private key from `.env.keys` into macOS Keychain.
+Move a private key from `.env.keys` into local macOS Keychain.
 
 ```sh
 $ dotenvx keychain up
@@ -2356,7 +2356,7 @@ $ dotenvx keychain down
 </details>
 <details><summary>`keychain push`</summary><br>
 
-Copy a private key from `.env.keys` into macOS Keychain.
+Copy a private key from `.env.keys` into local macOS Keychain.
 
 ```sh
 $ dotenvx keychain push
@@ -2488,7 +2488,7 @@ Commands:
                      prevent including .env files in docker
  
 Professional Security: 
-  keychain                 ⌥ move private keys into macOS Keychain
+  keychain                 ⌥ move private keys into local macOS Keychain
   armor                    ⛨ move private keys into Dotenvx Armor [www.dotenvx.com/armor]
 ```
 

@@ -1,6 +1,6 @@
 function configureKeychainCommand (keychain) {
   keychain
-    .description('store private keys in macOS Keychain')
+    .description('move private keys into local macOS Keychain')
     .action(function () {
       this.help()
     })
