@@ -7,14 +7,6 @@ const catchAndLog = require('../../lib/helpers/catchAndLog')
 const createSpinner = require('../../lib/helpers/createSpinner')
 const Session = require('../../db/session')
 
-async function writeKeysSrcEntries (keysSrcEntries) {
-  for (const [filepath, keysSrc] of Object.entries(keysSrcEntries || {})) {
-    if (keysSrc) {
-      await fsx.writeFileX(filepath, keysSrc)
-    }
-  }
-}
-
 async function encryptAction () {
   const options = this.opts()
   const spinner = await createSpinner({ ...options, text: 'encrypting' })
@@ -55,9 +47,11 @@ async function encryptAction () {
   }
 
   try {
-    const { keysSrcEntries, processedEnvs, changedFilepaths, unchangedFilepaths } = await encryptTransform({ envs, ik, ek, fk, noArmor, noCreate, noKeychain })
+    const { keysSrc, processedEnvs, changedFilepaths, unchangedFilepaths } = await encryptTransform({ envs, ik, ek, fk, noArmor, noCreate, noKeychain })
 
-    await writeKeysSrcEntries(keysSrcEntries)
+    if (keysSrc) {
+      await fsx.writeFileX(fk, keysSrc)
+    }
 
     if (spinner) spinner.stop()
     for (const processedEnv of processedEnvs) {

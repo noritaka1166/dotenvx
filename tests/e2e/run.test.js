@@ -122,7 +122,8 @@ t.test('#run - multiple encrypted .env files with multiple env keys files', ct =
     echo "console.log(process.env.HELLO + ' ' + process.env.HI)" > index.js
   `)
 
-  execShell(`${dotenvx} encrypt -f .env.local -fk .env.local.keys -f .env.production -fk .env.production.keys`)
+  execShell(`${dotenvx} encrypt -f .env.local -fk .env.local.keys`)
+  execShell(`${dotenvx} encrypt -f .env.production -fk .env.production.keys`)
 
   const command = `${node} index.js`
   ct.equal(execShell(`${dotenvx} run -f .env.local -fk .env.production.keys -f .env.production -fk .env.local.keys -- ${command}`).stdout, '⟐ injected env (4) from .env.local, .env.production\nlocal production')

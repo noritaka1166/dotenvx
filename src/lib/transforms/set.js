@@ -34,7 +34,7 @@ async function setTransform (options = {}) {
   const envs = options.envs || []
   const key = options.key
   const value = options.value
-  const fks = options.fk || '.env.keys'
+  const fk = options.fk || '.env.keys'
   let noArmor = options.noArmor // key storage selector below
   const noKeychain = options.noKeychain
   const noCreate = options.noCreate
@@ -43,22 +43,12 @@ async function setTransform (options = {}) {
   const processedEnvs = []
   const changedFilepaths = []
   const unchangedFilepaths = []
-  const keysSrcEntries = {}
 
-  async function loadKeysSrc (filepath) {
-    if (Object.prototype.hasOwnProperty.call(keysSrcEntries, filepath)) {
-      return keysSrcEntries[filepath]
-    }
-
-    let keysSrc
-    if (!await fsx.exists(filepath)) {
-      keysSrcEntries[filepath] = keysSrc
-      return keysSrc
-    }
-
+  let keysSrc
+  if (await fsx.exists(fk)) {
     try {
-      const encoding = await detectEncoding(filepath)
-      keysSrc = await fsx.readFileX(filepath, { encoding })
+      const encoding = await detectEncoding(fk)
+      keysSrc = await fsx.readFileX(fk, { encoding })
     } catch (err) {
       if (err.code === 'EACCES' || err.code === 'EPERM') {
         // do nothing (scenario: chmod a-r .env.keys)
@@ -66,12 +56,8 @@ async function setTransform (options = {}) {
         throw err
       }
     }
-
-    keysSrcEntries[filepath] = keysSrc
-    return keysSrc
   }
 
-  let envFileIndex = 0
   for (const env of determine(envs, process.env)) {
     if (env.type !== TYPE_ENV_FILE) {
       continue
@@ -79,12 +65,9 @@ async function setTransform (options = {}) {
 
     const envFilepath = env.envFilepath || env.value
     const filepath = env.filepath || path.resolve(envFilepath)
-    const fk = Array.isArray(fks) ? fks[envFileIndex] || '.env.keys' : fks
-    envFileIndex += 1
     const row = { key, value, type: TYPE_ENV_FILE, filepath, envFilepath, changed: false }
 
     try {
-      let keysSrc = await loadKeysSrc(fk)
       const fileExists = await fsx.exists(filepath)
       if (!fileExists && !noCreate) {
         row.envSrc = ''
@@ -120,7 +103,6 @@ async function setTransform (options = {}) {
         if (noArmor) {
           const mutated = mutateKeysSrc({ keysSrc, privateKeyName, privateKeyValue: privateKey, comment })
           keysSrc = mutated.keysSrc
-          keysSrcEntries[fk] = keysSrc
         } else {
           const sesh = new Session()
           const hostname = sesh.hostname()
@@ -196,7 +178,7 @@ async function setTransform (options = {}) {
   }
 
   return {
-    keysSrcEntries,
+    keysSrc,
     processedEnvs,
     changedFilepaths,
     unchangedFilepaths

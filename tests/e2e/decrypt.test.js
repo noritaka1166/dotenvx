@@ -61,7 +61,8 @@ t.test('#decrypt - multiple env keys files', ct => {
     echo "HI=there" > .env.production
   `)
 
-  execShell(`${dotenvx} encrypt -f .env.local -fk .env.local.keys -f .env.production -fk .env.production.keys`)
+  execShell(`${dotenvx} encrypt -f .env.local -fk .env.local.keys`)
+  execShell(`${dotenvx} encrypt -f .env.production -fk .env.production.keys`)
 
   const output = execShell(`${dotenvx} decrypt -f .env.local -fk .env.production.keys -f .env.production -fk .env.local.keys`)
   ct.equal(output, '◇ decrypted (.env.local,.env.production)')
