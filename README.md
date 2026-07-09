@@ -785,23 +785,6 @@ $ dotenvx encrypt
 
 More examples
 
-<details><summary>protect from agents</summary><br>
-
-After encryption, `DOTENV_PUBLIC_KEY` lives in your encrypted `.env` file. This means agents and automation can keep running `dotenvx set` and `dotenvx encrypt` without reading `.env.keys`.
-
-```sh
-$ chmod a-r .env.keys
-
-$ dotenvx set HELLO World
-◈ encrypted HELLO (.env)
-
-$ dotenvx encrypt
-◈ encrypted (.env)
-```
-
-Keep `.env.keys` unreadable by agents, while still letting them safely update encrypted values.
-
-</details>
 <details><summary>`.env`</summary><br>
 
 ```sh
@@ -896,6 +879,23 @@ $ dotenvx encrypt --stdout > .env.encrypted
 > `secp256k1` is a well-known and battle tested curve, in use with Bitcoin and other cryptocurrencies, but we are open to adding support for more curves.
 > 
 > If your organization's compliance department requires [NIST approved curves](https://csrc.nist.gov/projects/elliptic-curve-cryptography) or other curves like `curve25519`, please reach out at [security@dotenvx.com](mailto:security@dotenvx.com).
+
+</details>
+<details><summary>agents</summary><br>
+
+After encryption, `DOTENV_PUBLIC_KEY` lives in your encrypted `.env` file. This means agents and automation can keep running `dotenvx set` and `dotenvx encrypt` without reading `.env.keys`.
+
+```sh
+$ chmod a-r .env.keys
+
+$ dotenvx set HELLO World
+◈ encrypted HELLO (.env)
+
+$ dotenvx encrypt
+◈ encrypted (.env)
+```
+
+Keep `.env.keys` unreadable by agents, while still letting them safely update encrypted values.
 
 </details>
 
