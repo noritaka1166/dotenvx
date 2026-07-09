@@ -41,7 +41,8 @@ jobs:
           node-version: 20.x
       - name: install shellspec
         run: |
-          curl -sfSL https://git.io/shellspec | sh -s 0.28.1 --yes --prefix "$RUNNER_TEMP/shellspec"
+          curl -fsSL https://raw.githubusercontent.com/shellspec/shellspec/b8935ec266d2c5f7f364c6024730e4d68432cce3/install.sh -o "$RUNNER_TEMP/install-shellspec.sh"
+          sh "$RUNNER_TEMP/install-shellspec.sh" 0.28.1 --yes --prefix "$RUNNER_TEMP/shellspec"
           echo "$RUNNER_TEMP/shellspec/bin" >> "$GITHUB_PATH"
       - run: shellspec --version
       - run: npm install

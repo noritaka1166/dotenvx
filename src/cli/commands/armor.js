@@ -3,7 +3,7 @@ const Session = require('./../../db/session')
 
 function configureArmorCommand (armor) {
   armor
-    .description('move private keys off-device')
+    .description('move private keys into Dotenvx Armor [www.dotenvx.com/armor]')
     .allowUnknownOption()
     .argument('[command]', 'dotenvx-armor command')
     .argument('[args...]', 'dotenvx-armor command arguments')

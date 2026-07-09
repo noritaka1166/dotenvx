@@ -8,10 +8,9 @@ const createSpinner = require('../../lib/helpers/createSpinner')
 const Errors = require('../../lib/helpers/errors')
 const prompts = require('../../lib/helpers/prompts')
 const Session = require('../../db/session')
-const normalizeArmorAliases = require('./normalizeArmorAliases')
 
 async function set (key, value) {
-  const options = normalizeArmorAliases(this.opts())
+  const options = this.opts()
 
   let encrypt = true
   let settingMessage = 'encrypting'
@@ -65,7 +64,7 @@ async function set (key, value) {
   const fk = options.envKeysFile || '.env.keys'
   const noCreate = options.create === false
   const noArmor = options.armor === false || (!options.token && (await sesh.noArmor()))
-  const noKeychain = options.keychain === false || options.noKeychain === true
+  const noKeychain = options.native === false || options.noNative === true
 
   let errorCount = 0
 

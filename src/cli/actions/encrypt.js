@@ -6,10 +6,9 @@ const encryptTransform = require('./../../lib/transforms/encrypt')
 const catchAndLog = require('../../lib/helpers/catchAndLog')
 const createSpinner = require('../../lib/helpers/createSpinner')
 const Session = require('../../db/session')
-const normalizeArmorAliases = require('./normalizeArmorAliases')
 
 async function encryptAction () {
-  const options = normalizeArmorAliases(this.opts())
+  const options = this.opts()
   const spinner = await createSpinner({ ...options, text: 'encrypting' })
   const sesh = new Session()
 
@@ -21,7 +20,7 @@ async function encryptAction () {
   const fk = options.envKeysFile || '.env.keys'
   const noCreate = options.create === false
   const noArmor = options.armor === false || (!options.token && (await sesh.noArmor()))
-  const noKeychain = options.keychain === false || options.noKeychain === true
+  const noKeychain = options.native === false || options.noNative === true
 
   let errorCount = 0
 

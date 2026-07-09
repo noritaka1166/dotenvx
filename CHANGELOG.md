@@ -2,7 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.2.2...main)
+[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.3.0...main)
+
+## [2.3.0](https://github.com/dotenvx/dotenvx/compare/v2.2.2...v2.3.0) (2026-07-08)
+
+### Added
+
+* Add `lock up` and `lock down` commands for password protecting private keys ([#875](https://github.com/dotenvx/dotenvx/pull/875))
+
+### Changed
+
+* BREAKING: Rename `keychain` commands to `native` to make way for windows and linux. ([#875](https://github.com/dotenvx/dotenvx/pull/875))
+
+### Removed
+
+* BREAKING: Remove `--no-ops`. Use `--no-armor`. ([#875](https://github.com/dotenvx/dotenvx/pull/875))
 
 ## [2.2.2](https://github.com/dotenvx/dotenvx/compare/v2.2.1...v2.2.2) (2026-07-08)
 
