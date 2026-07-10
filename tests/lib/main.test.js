@@ -559,7 +559,7 @@ t.test('config monorepo/apps/backend/.env AND frontend/missing',
     ct.end()
   })
 
-t.test('config monorepo/apps/backend/.env AND attempt on directory frontend',
+t.test('config monorepo/apps/backend/.env AND directory frontend',
   ct => {
     const processEnv = {}
 
@@ -572,12 +572,12 @@ t.test('config monorepo/apps/backend/.env AND attempt on directory frontend',
 
     t.equal(processEnv.HELLO, 'backend')
     t.equal(parsed.HELLO, 'backend')
-    t.equal(error.code, 'MISSING_ENV_FILE')
+    t.equal(error, undefined)
 
     ct.end()
   })
 
-t.test('config monorepo/apps/backend/.env AND attempt on directory frontend --strict it throws',
+t.test('config monorepo/apps/backend/.env AND directory frontend --strict',
   ct => {
     const processEnv = {}
 
@@ -587,17 +587,16 @@ t.test('config monorepo/apps/backend/.env AND attempt on directory frontend --st
       strict: true
     }
 
-    try {
-      main.config(options)
-      ct.fail('should have raised an error but did not')
-    } catch (error) {
-      ct.equal(error.code, 'MISSING_ENV_FILE')
-    }
+    const { parsed, error } = main.config(options)
+
+    t.equal(processEnv.HELLO, 'backend')
+    t.equal(parsed.HELLO, 'backend')
+    t.equal(error, undefined)
 
     ct.end()
   })
 
-t.test('config monorepo/apps/backend/.env AND attempt on directory frontend --strict but error ALSO ignored',
+t.test('config monorepo/apps/backend/.env AND frontend/missing --strict but error ALSO ignored',
   ct => {
     const loggerErrorStub = sinon.stub(logger, 'error')
     const stub = sinon.stub(envsResolver, 'sync')
@@ -606,7 +605,7 @@ t.test('config monorepo/apps/backend/.env AND attempt on directory frontend --st
     const processEnv = {}
     const options = {
       processEnv,
-      path: ['tests/monorepo/apps/backend/.env', 'tests/monorepo/apps/frontend'],
+      path: ['tests/monorepo/apps/backend/.env', 'tests/monorepo/apps/frontend/missing'],
       strict: true,
       ignore: ['MISSING_ENV_FILE']
     }

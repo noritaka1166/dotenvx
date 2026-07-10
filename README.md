@@ -2929,6 +2929,28 @@ $ DOTENV_CONFIG_CONVENTION=nextjs node index.js
 ```
 
 </details>
+<details><summary>`config(path: directory, convention: 'nextjs')` - directory</summary><br>
+
+Use a directory as `path` to make it the base for convention files. This is useful when loading a workspace's env files from a monorepo root.
+
+```js
+// index.js
+require('@dotenvx/dotenvx').config({
+  path: 'apps/web',
+  convention: 'nextjs'
+})
+```
+
+This loads the convention from `apps/web`:
+
+```text
+apps/web/.env.development.local
+apps/web/.env.local
+apps/web/.env.development
+apps/web/.env
+```
+
+</details>
 <details><summary>`config(noArmor:)` - noArmor</summary><br>
 
 Turn off [Dotenvx Armor ⛨](https://dotenvx.com/armor) features.

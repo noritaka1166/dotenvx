@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.4.0...main)
+[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.4.1...main)
+
+## [2.4.1](https://github.com/dotenvx/dotenvx/compare/v2.4.0...v2.4.1) (2026-07-10)
+
+### Added
+
+* Support `config(path:)` as a directory like `app/web`. Useful for monorepos ([#882](https://github.com/dotenvx/dotenvx/pull/882))
 
 ## [2.4.0](https://github.com/dotenvx/dotenvx/compare/v2.3.4...v2.4.0) (2026-07-10)
 

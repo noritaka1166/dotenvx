@@ -18,6 +18,7 @@ const setTransform = require('./transforms/set')
 
 // helpers
 const buildEnvs = require('./helpers/buildEnvs')
+const buildConfigEnvs = require('./helpers/buildConfigEnvs')
 const { determine } = require('./helpers/envResolution')
 const fsx = require('./helpers/fsx')
 const decryptKeyValue = require('./helpers/cryptography/decryptKeyValue')
@@ -69,7 +70,7 @@ const config = function (options = {}) {
   const noKeychain = resolveNoKeychain(options)
 
   try {
-    let envs = buildEnvs(options)
+    let envs = buildConfigEnvs(options)
     if (!options.envs) {
       envs = determine(envs, processEnv)
     }
