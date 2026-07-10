@@ -11,6 +11,7 @@ const ISSUE_BY_CODE = {
   INVALID_PUBLIC_KEY: 'https://github.com/dotenvx/dotenvx/issues/756',
   MALFORMED_ENCRYPTED_DATA: 'https://github.com/dotenvx/dotenvx/issues/467',
   MISPAIRED_PRIVATE_KEY: 'https://github.com/dotenvx/dotenvx/issues/752',
+  MULTIPLE_ENV_KEYS_FILES: 'pass a single --env-keys-file when creating a new private key',
   MISSING_DIRECTORY: 'https://github.com/dotenvx/dotenvx/issues/758',
   MISSING_ENV_FILE: 'https://github.com/dotenvx/dotenvx/issues/484',
   MISSING_ENV_KEYS_FILE: 'https://github.com/dotenvx/dotenvx/issues/775',
@@ -184,6 +185,18 @@ class Errors {
   missingDirectory () {
     const code = 'MISSING_DIRECTORY'
     const message = `[${code}] missing directory (${this.directory})`
+    const help = `fix: [${ISSUE_BY_CODE[code]}]`
+
+    const e = new Error(message)
+    e.code = code
+    e.help = help
+    e.messageWithHelp = `${message}. ${help}`
+    return e
+  }
+
+  multipleEnvKeysFiles () {
+    const code = 'MULTIPLE_ENV_KEYS_FILES'
+    const message = `[${code}] cannot create a new private key with multiple --env-keys-file values`
     const help = `fix: [${ISSUE_BY_CODE[code]}]`
 
     const e = new Error(message)

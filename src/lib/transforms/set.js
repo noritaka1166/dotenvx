@@ -39,16 +39,17 @@ async function setTransform (options = {}) {
   const noKeychain = options.noKeychain
   const noCreate = options.noCreate
   const noEncrypt = !options.encrypt || isPlainKey(key)
+  const keysFilepath = Array.isArray(fk) ? null : fk
 
   const processedEnvs = []
   const changedFilepaths = []
   const unchangedFilepaths = []
 
   let keysSrc
-  if (await fsx.exists(fk)) {
+  if (keysFilepath && await fsx.exists(keysFilepath)) {
     try {
-      const encoding = await detectEncoding(fk)
-      keysSrc = await fsx.readFileX(fk, { encoding })
+      const encoding = await detectEncoding(keysFilepath)
+      keysSrc = await fsx.readFileX(keysFilepath, { encoding })
     } catch (err) {
       if (err.code === 'EACCES' || err.code === 'EPERM') {
         // do nothing (scenario: chmod a-r .env.keys)
@@ -86,6 +87,10 @@ async function setTransform (options = {}) {
 
       // only create if missing public key and encryption needed
       if (!publicKey && !noEncrypt) {
+        if (Array.isArray(fk)) {
+          throw new Errors().multipleEnvKeysFiles()
+        }
+
         if (!noCreate && !noArmor && selectKeyStorage) {
           noArmor = await selectKeyStorage() !== 'armored'
         }
@@ -95,7 +100,7 @@ async function setTransform (options = {}) {
         publicKey = kp.publicKey
         const privateKey = kp.privateKey
         const { publicKeyName, privateKeyName } = keynames(envFilepath)
-        const { envSrc } = mutateSrc({ envSrc: row.envSrc, envFilepath, keysFilepath: fk, publicKeyName, publicKeyValue: publicKey })
+        const { envSrc } = mutateSrc({ envSrc: row.envSrc, envFilepath, keysFilepath, publicKeyName, publicKeyValue: publicKey })
         row.envSrc = envSrc
 
         const comment = path.basename(envFilepath)

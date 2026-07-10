@@ -112,6 +112,28 @@ t.test('keypair collects multiple env files and env keys files', (ct) => {
   ct.end()
 })
 
+t.test('set collects multiple env keys files', (ct) => {
+  const executeDynamicStub = sinon.stub()
+  const setStub = sinon.stub()
+  const processExitStub = sinon.stub(process, 'exit')
+  const originalArgv = process.argv
+
+  process.argv = ['node', 'dotenvx', 'set', 'HELLO', 'World', '-f', '.env.local', '-fk', '.env.local.keys', '-fk', '.env.production.keys']
+
+  proxyquire('../../src/cli/dotenvx', {
+    './../lib/helpers/executeDynamic': executeDynamicStub,
+    './actions/set': setStub
+  })
+
+  ct.equal(processExitStub.callCount, 0, 'process.exit is not called')
+  ct.equal(executeDynamicStub.callCount, 0, 'executeDynamic is not called')
+  ct.equal(setStub.callCount, 1, 'set action is called')
+  ct.same(setStub.firstCall.thisValue.opts().envKeysFile, ['.env.local.keys', '.env.production.keys'], 'env keys files are collected')
+
+  process.argv = originalArgv
+  ct.end()
+})
+
 t.test('armor resolves through native command', (ct) => {
   const executeDynamicStub = sinon.stub()
   const configureArmorCommandStub = sinon.stub().callsFake((armorCommand) => {
