@@ -1,7 +1,7 @@
 const Session = require('./../../db/session')
 
 const armorProvider = require('./armor/index')
-const keychainProvider = require('./keychain/index')
+const nativeProvider = require('./native/index')
 
 function syncArmorProvider (publicKeyHex) {
   const { createSyncFn } = require('@dotenvx/tooling')
@@ -43,8 +43,8 @@ function armorProviderForOptions (options) {
   })
 }
 
-function useKeychain (options) {
-  if (process.platform !== 'darwin') return false
+function useNative (options) {
+  if (process.platform !== 'darwin' && process.platform !== 'win32') return false
   if (process.env.CI) return false
   return options.noNative !== true && options.native !== false && options.noKeychain !== true
 }
@@ -67,8 +67,8 @@ async function providers (options = {}) {
 
   const providerFns = []
 
-  if (useKeychain(options)) {
-    providerFns.push(keychainProvider)
+  if (useNative(options)) {
+    providerFns.push(nativeProvider)
   }
 
   if (options.noArmor !== true && options.armor !== false) {
@@ -89,8 +89,8 @@ providers.sync = function providersSync (options = {}) {
 
   const providerFns = []
 
-  if (useKeychain(options)) {
-    providerFns.push(keychainProvider)
+  if (useNative(options)) {
+    providerFns.push(nativeProvider)
   }
 
   if (options.noArmor !== true && options.armor !== false) {
