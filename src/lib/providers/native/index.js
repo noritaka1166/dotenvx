@@ -14,7 +14,7 @@ function get (key) {
   return macosKeychain.get(key)
 }
 
-function set (key, value, label) {
+function set (key, value, label = key) {
   if (process.platform === 'win32') {
     windowsCredentialManager.set(key, value, label)
     return

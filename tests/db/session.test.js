@@ -5,9 +5,12 @@ const t = require('tap')
 const proxyquire = require('proxyquire')
 const sinon = require('sinon')
 const tooling = require('@dotenvx/tooling')
+const nativeProvider = require('../../src/lib/providers/native')
 
 t.beforeEach(() => {
   process.env.DOTENVX_CONFIG = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenvx-session-'))
+  sinon.stub(nativeProvider, 'set').throws(new Error('native secret store unavailable'))
+  sinon.stub(nativeProvider, 'delete').throws(new Error('native secret store unavailable'))
 })
 
 t.afterEach(() => {
@@ -30,6 +33,18 @@ t.test('Session stores login settings in dotenvx config', async ct => {
   ct.equal(sesh.status(), 'on')
   ct.type(sesh.path(), 'string')
   ct.match(fs.readFileSync(path.join(process.env.DOTENVX_CONFIG, '.env'), 'utf8'), /DOTENVX_ARMOR_TOKEN="token-123"/)
+})
+
+t.test('Session stores login token in native secret store first', ct => {
+  nativeProvider.set.resetBehavior()
+
+  const Session = require('../../src/db/session')
+  const sesh = new Session()
+
+  ct.equal(sesh.login('https://armor.example.com', 'user-id', 'scott', 'token-123'), 'token-123')
+  ct.same(nativeProvider.set.firstCall.args, ['DOTENVX_ARMOR_TOKEN', 'token-123'])
+  ct.notMatch(fs.readFileSync(path.join(process.env.DOTENVX_CONFIG, '.env'), 'utf8'), /DOTENVX_ARMOR_TOKEN/)
+  ct.end()
 })
 
 t.test('Session validates login settings before saving', ct => {
@@ -70,7 +85,9 @@ t.test('Session logout clears login settings when config exists', ct => {
 
   sesh.login('https://armor.example.com', 'user-id', 'scott', 'token-123')
   ct.equal(sesh.status(), 'on')
+  nativeProvider.delete.resetBehavior()
   ct.equal(sesh.logout('https://armor.example.com', 'user-id', 'token-123'), true)
+  ct.same(nativeProvider.delete.firstCall.args, ['DOTENVX_ARMOR_TOKEN'])
   ct.equal(sesh.username(), undefined)
   ct.equal(sesh.token(), undefined)
   ct.equal(sesh.hostname(), 'https://armor.dotenvx.com')

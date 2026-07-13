@@ -5,6 +5,7 @@ const { Conf, dotenv, envPaths } = require('@dotenvx/tooling')
 const jsonToEnv = require('./../lib/helpers/jsonToEnv')
 const packageJson = require('./../lib/helpers/packageJson')
 const { http } = require('./../lib/helpers/http')
+const nativeProvider = require('./../lib/providers/native')
 const { logger } = require('./../shared/logger')
 
 const HOURS_24 = 60 * 60 * 24 * 1000
@@ -223,11 +224,22 @@ class Session {
   // Set/Delete
   //
   setInSecretStore (key, value) {
-    return this.createStore().set(key, value)
+    try {
+      nativeProvider.set(key, value)
+      return value
+    } catch {
+      this.createStore().set(key, value)
+      return value
+    }
   }
 
   deleteFromSecretStore (key) {
-    return this.openStore().delete(key)
+    try {
+      nativeProvider.delete(key)
+    } catch {}
+
+    const store = this.openStore()
+    if (store) store.delete(key)
   }
 
   login (hostname, id, username, accessToken) {
@@ -269,12 +281,12 @@ class Session {
       throw new Error('DOTENVX_ARMOR_TOKEN not set. Run [dotenvx armor login]')
     }
 
+    this.deleteFromSecretStore(ARMOR.TOKEN)
+
     const store = this.openStore()
     if (!store) return true
-
     store.delete(ARMOR.USER)
     store.delete(ARMOR.USERNAME)
-    this.deleteFromSecretStore(ARMOR.TOKEN)
     store.delete(ARMOR.HOSTNAME)
     store.delete(DOTENVX.VERSION)
     store.delete(DOTENVX.VERSION_LAST_CHECK)

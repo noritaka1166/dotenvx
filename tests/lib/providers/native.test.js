@@ -86,6 +86,19 @@ t.test('native provider writes macOS Keychain on darwin', ct => {
   ct.end()
 })
 
+t.test('native provider defaults secret label to key', ct => {
+  const set = sinon.stub()
+  const provider = proxyquire('../../../src/lib/providers/native', {
+    '../../helpers/macosKeychain': { set }
+  })
+
+  setPlatform('darwin')
+  provider.set('DOTENVX_ARMOR_TOKEN', 'token-123')
+
+  ct.same(set.firstCall.args, ['DOTENVX_ARMOR_TOKEN', 'token-123', 'DOTENVX_ARMOR_TOKEN'])
+  ct.end()
+})
+
 t.test('native provider writes Windows Credential Manager on win32', ct => {
   const set = sinon.stub()
   const provider = proxyquire('../../../src/lib/providers/native', {
