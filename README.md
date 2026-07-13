@@ -1472,6 +1472,21 @@ $ dotenvx run -fk .env.keys -f apps/app1/.env -- yourcommand
 ```
 
 </details>
+<details><summary>`run --mask`</summary><br>
+
+Inject masked values into the command. By default, up to the first six characters are visible.
+
+```sh
+$ echo "SECRET=abcdefghijkl" > .env
+$ echo "console.log(process.env.SECRET)" > index.js
+
+$ dotenvx run --mask --quiet -- node index.js
+abcdef******
+```
+
+Pass a number to control how many characters are visible, such as `--mask 0` to fully mask values.
+
+</details>
 <details><summary>`run --token`</summary><br>
 
 Set Armor ⛨ token for retrieving armored private keys.
@@ -1509,6 +1524,20 @@ $ echo "HELLO=Dotenvx" > .env
 $ dotenvx get HELLO
 World
 ```
+
+</details>
+<details><summary>`get KEY --mask`</summary><br>
+
+Return a masked environment variable value. By default, up to the first six characters are visible.
+
+```sh
+$ echo "SECRET=abcdefghijkl" > .env
+
+$ dotenvx get SECRET --mask
+abcdef******
+```
+
+Pass a number to control how many characters are visible, such as `--mask 0` to fully mask values.
 
 </details>
 <details><summary>`get KEY --no-native`</summary><br>
@@ -2142,6 +2171,23 @@ $ dotenvx decrypt --stdout > somefile.txt
 ```
 
 </details>
+<details><summary>`decrypt --stdout --mask`</summary><br>
+
+Decrypt the contents of an encrypted `.env` file to stdout with its values masked. The encrypted `.env` file remains unchanged.
+
+```sh
+$ echo "SECRET=abcdefghijkl" > .env
+$ dotenvx encrypt
+◈ encrypted (.env)
+
+$ dotenvx decrypt --stdout --mask
+...
+SECRET="abcdef******"
+```
+
+Pass a number to control how many characters are visible, such as `--mask 0` to fully mask values.
+
+</details>
 <details><summary>`keypair`</summary><br>
 
 Print public/private keys for `.env` file.
@@ -2726,6 +2772,33 @@ Hello Dotenvx
 It defaults to looking for a `.env` file.
 
 </details>
+<details><summary>`config(mask: true)` - mask</summary><br>
+
+Inject and return masked values. By default, up to the first six characters are visible.
+
+```ini
+# .env
+SECRET="abcdefghijkl"
+```
+
+```js
+// index.js
+const dotenvx = require('@dotenvx/dotenvx')
+const result = dotenvx.config({ mask: true, quiet: true })
+
+console.log(process.env.SECRET)
+console.log(result.parsed.SECRET)
+```
+
+```sh
+$ node index.js
+abcdef******
+abcdef******
+```
+
+Set `mask: 0` to fully mask values.
+
+</details>
 <details><summary>`config(path: ['.env.local', '.env'])` - multiple files</summary><br>
 
 Specify path(s) to multiple .env files.
@@ -3050,6 +3123,25 @@ console.log(decryptedValue)
 ```
 
 This is known as *Decryption at Access* and is written about in [the whitepaper](https://dotenvx.com/dotenvx.pdf).
+
+</details>
+<details><summary>`get(KEY, {mask:})`</summary><br>
+
+Programmatically return a masked environment variable value.
+
+```js
+// index.js
+const dotenvx = require('@dotenvx/dotenvx')
+const maskedValue = await dotenvx.get('SECRET', { mask: true })
+console.log(maskedValue)
+```
+
+```sh
+$ node index.js
+abcdef******
+```
+
+Set `mask: 0` to fully mask values.
 
 </details>
 
