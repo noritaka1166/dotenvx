@@ -134,7 +134,7 @@ class Session {
   }
 
   token () {
-    return this.readSetting('TOKEN') || undefined
+    return this.getFromSecretStore(ARMOR.TOKEN) || undefined
   }
 
   devicePublicKey () {
@@ -223,6 +223,18 @@ class Session {
   //
   // Set/Delete
   //
+  getFromSecretStore (key) {
+    try {
+      const value = nativeProvider.get(key)
+      if (value) return value
+    } catch {}
+
+    const store = this.openStore()
+    if (!store) return undefined
+
+    return store.get(key)
+  }
+
   setInSecretStore (key, value) {
     try {
       nativeProvider.set(key, value)
