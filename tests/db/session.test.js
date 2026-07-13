@@ -32,8 +32,32 @@ t.test('Session stores login settings in dotenvx config', async ct => {
   ct.equal(sesh.username(), 'scott')
   ct.equal(sesh.token(), 'token-123')
   ct.equal(sesh.status(), 'on')
+  ct.equal(sesh.on(), true)
+  ct.equal(sesh.off(), false)
   ct.type(sesh.path(), 'string')
-  ct.match(fs.readFileSync(path.join(process.env.DOTENVX_CONFIG, '.env'), 'utf8'), /DOTENVX_ARMOR_TOKEN="token-123"/)
+  const config = fs.readFileSync(path.join(process.env.DOTENVX_CONFIG, '.env'), 'utf8')
+  ct.match(config, /DOTENVX_ARMOR_TOKEN="token-123"/)
+  ct.match(config, /DOTENVX_ARMOR_ON="true"/)
+})
+
+t.test('Session turns armor off and on in settings', ct => {
+  const Session = require('../../src/db/session')
+  const sesh = new Session()
+
+  sesh.login('https://armor.example.com', 'user-id', 'scott', 'token-123')
+
+  ct.equal(sesh.turnOff(), 'false')
+  ct.equal(sesh.on(), false)
+  ct.equal(sesh.off(), true)
+  ct.equal(sesh.status(), 'off')
+  ct.match(fs.readFileSync(path.join(process.env.DOTENVX_CONFIG, '.env'), 'utf8'), /DOTENVX_ARMOR_ON="false"/)
+
+  ct.equal(sesh.turnOn(), 'true')
+  ct.equal(sesh.on(), true)
+  ct.equal(sesh.off(), false)
+  ct.equal(sesh.status(), 'on')
+  ct.match(fs.readFileSync(path.join(process.env.DOTENVX_CONFIG, '.env'), 'utf8'), /DOTENVX_ARMOR_ON="true"/)
+  ct.end()
 })
 
 t.test('Session stores login token in native secret store first', ct => {

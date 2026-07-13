@@ -15,7 +15,8 @@ const ARMOR = {
   HOSTNAME: 'DOTENVX_ARMOR_HOSTNAME',
   USER: 'DOTENVX_ARMOR_USER',
   USERNAME: 'DOTENVX_ARMOR_USERNAME',
-  TOKEN: 'DOTENVX_ARMOR_TOKEN'
+  TOKEN: 'DOTENVX_ARMOR_TOKEN',
+  ON: 'DOTENVX_ARMOR_ON'
 }
 
 const DOTENVX = {
@@ -101,7 +102,7 @@ class Session {
 
   status () {
     // if logged in
-    if (this.username() && this.token()) {
+    if (this.username() && this.token() && this.on()) {
       return 'on'
     }
 
@@ -135,6 +136,14 @@ class Session {
 
   token () {
     return this.getFromSecretStore(ARMOR.TOKEN) || undefined
+  }
+
+  on () {
+    return (this.readSetting('ON') || 'true') === 'true'
+  }
+
+  off () {
+    return (this.readSetting('ON') || 'true') === 'false'
   }
 
   devicePublicKey () {
@@ -254,6 +263,16 @@ class Session {
     if (store) store.delete(key)
   }
 
+  turnOn () {
+    this.createStore().set(ARMOR.ON, 'true')
+    return 'true'
+  }
+
+  turnOff () {
+    this.createStore().set(ARMOR.ON, 'false')
+    return 'false'
+  }
+
   login (hostname, id, username, accessToken) {
     if (!hostname) {
       throw new Error('DOTENVX_ARMOR_HOSTNAME not set. Run [dotenvx armor login]')
@@ -276,6 +295,7 @@ class Session {
     store.set(ARMOR.USERNAME, username)
     this.setInSecretStore(ARMOR.TOKEN, accessToken)
     store.set(ARMOR.HOSTNAME, hostname)
+    store.set(ARMOR.ON, 'true')
 
     return accessToken
   }
@@ -300,6 +320,7 @@ class Session {
     store.delete(ARMOR.USER)
     store.delete(ARMOR.USERNAME)
     store.delete(ARMOR.HOSTNAME)
+    store.delete(ARMOR.ON)
     store.delete(DOTENVX.VERSION)
     store.delete(DOTENVX.VERSION_LAST_CHECK)
     return true

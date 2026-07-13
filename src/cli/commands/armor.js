@@ -71,6 +71,9 @@ function configureArmorCommand (armor) {
       return require('./../actions/armor/move').apply(this, args)
     })
 
+  // dotenvx armor settings
+  require('./settings')(armor.command('settings'))
+
   // dotenvx armor login
   armor
     .command('login')
