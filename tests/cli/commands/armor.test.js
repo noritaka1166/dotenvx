@@ -9,7 +9,7 @@ const Session = require('../../../src/db/session')
 
 const armor = configureArmorCommand(new Command('armor'))
 const commandsWithToken = ['up', 'down', 'push', 'pull', 'move']
-const nativeCommands = [...commandsWithToken, 'login', 'logout', 'settings']
+const nativeCommands = [...commandsWithToken, 'login', 'logout', 'status', 'settings']
 
 t.test('armor subcommands accept explicit token option', async (ct) => {
   for (const commandName of commandsWithToken) {
@@ -34,10 +34,10 @@ t.test('armor commands are native cli subcommands', async (ct) => {
   ct.notMatch(rootHelp, /\n {2}armor {2,}move private keys off-device/, 'hides native armor command from root command list')
 
   for (const commandName of nativeCommands) {
-    const options = commandName === 'settings' ? '' : ' \\[options\\]'
+    const options = ['status', 'settings'].includes(commandName) ? '' : ' \\[options\\]'
     ct.match(armorHelp, new RegExp(`\\n  ${commandName}${options}`), `has armor ${commandName} subcommand`)
   }
-  ct.same(armor.commands.map(command => command.name()), nativeCommands, 'orders settings after login and logout')
+  ct.same(armor.commands.map(command => command.name()), nativeCommands, 'orders status and settings after login and logout')
 
   ct.notMatch(armorHelp, /\n {2}keypair \[options\].*generate armored keypair/, 'does not register armor keypair')
 })
@@ -61,6 +61,22 @@ t.test('armor login and logout resolve through native actions', async (ct) => {
 
   ct.equal(loginStub.callCount, 1, 'login action is called')
   ct.equal(logoutStub.callCount, 1, 'logout action is called')
+})
+
+t.test('armor status resolves through native action', async (ct) => {
+  const statusStub = sinon.stub()
+  const executeDynamicStub = sinon.stub()
+  const configureArmorCommand = proxyquire('../../../src/cli/commands/armor', {
+    './../actions/armor/status': statusStub,
+    './../../lib/helpers/executeDynamic': executeDynamicStub
+  })
+  const armor = configureArmorCommand(new Command('armor'))
+  const status = armor.commands.find(command => command.name() === 'status')
+
+  await status._actionHandler([])
+
+  ct.equal(statusStub.callCount, 1, 'status action is called')
+  ct.equal(executeDynamicStub.callCount, 0, 'does not call dotenvx-armor')
 })
 
 t.test('armor settings is an embedded native command', async (ct) => {

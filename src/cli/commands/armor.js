@@ -91,6 +91,14 @@ function configureArmorCommand (armor) {
       return require('./../actions/logout').apply(this, args)
     })
 
+  // dotenvx armor status
+  armor
+    .command('status')
+    .description('print armor status')
+    .action(function (...args) {
+      return require('./../actions/armor/status').apply(this, args)
+    })
+
   // dotenvx armor settings
   require('./settings')(armor.command('settings'))
 
