@@ -49,6 +49,8 @@ function uniqueInjectedKeys (processedEnvs) {
 }
 
 function maskProcessedEnvs (processedEnvs, commandEnv, showChar) {
+  // Track every key resolved from the requested env sources so the same keys
+  // can also be masked in the environment passed to the child command.
   const resolvedKeys = new Set()
 
   for (const processedEnv of processedEnvs) {
@@ -56,6 +58,7 @@ function maskProcessedEnvs (processedEnvs, commandEnv, showChar) {
       resolvedKeys.add(key)
     }
 
+    // These values are logged below, so mask each resolver reporting bucket.
     for (const values of [processedEnv.parsed, processedEnv.injected, processedEnv.existed]) {
       for (const key of Object.keys(values || {})) {
         values[key] = mask(values[key], showChar)
@@ -63,6 +66,7 @@ function maskProcessedEnvs (processedEnvs, commandEnv, showChar) {
     }
   }
 
+  // Leave unrelated inherited environment variables unchanged.
   for (const key of resolvedKeys) {
     if (commandEnv[key] !== undefined) {
       commandEnv[key] = mask(commandEnv[key], showChar)
