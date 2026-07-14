@@ -45,32 +45,33 @@ async function main () {
     platform: 'node',
     target: 'node18',
     sourcemap: !minify,
+    minify,
+    keepNames: minify,
     outfile,
     // suppress direct-eval warning
     logOverride: {
-      'direct-eval': 'silent'
+      'direct-eval': 'silent',
+      'require-resolve-not-external': 'silent'
     }
   }
 
   await esbuild.build(config)
 
+  await Promise.all([
+    esbuild.build({
+      ...config,
+      entryPoints: ['src/lib/providers/provider-worker.js'],
+      outfile: `${outputDir}/provider-worker.js`
+    }),
+    esbuild.build({
+      ...config,
+      entryPoints: ['src/lib/decryptors/decryptor-worker.js'],
+      outfile: `${outputDir}/decryptor-worker.js`
+    })
+  ])
+
   console.log(`Build took ${Date.now() - start}ms`)
   await printSize(outfile)
-
-  if (minify) {
-    // minify the file
-    await esbuild.build({
-      ...config,
-      entryPoints: [outfile],
-      minify: true,
-      keepNames: true,
-      allowOverwrite: true,
-      outfile
-    })
-
-    console.log(`Minify took ${Date.now() - start}ms`)
-    await printSize(outfile)
-  }
 
   // create main patched package.json
   cleanPkgJson(pkgJson)
@@ -80,12 +81,16 @@ async function main () {
   }
 
   pkgJson.bin = 'index.js'
+  pkgJson.pkg = {
+    scripts: [
+      'provider-worker.js',
+      'decryptor-worker.js'
+    ]
+  }
   if (!minify) {
-    pkgJson.pkg = {
-      assets: [
-        '*.map'
-      ]
-    }
+    pkgJson.pkg.assets = [
+      '*.map'
+    ]
   }
 
   await writeFile(

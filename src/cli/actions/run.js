@@ -151,7 +151,7 @@ async function run () {
         if (error.code === 'MISSING_ENV_FILE' && options.convention) { // do not output error for conventions (too noisy)
           // intentionally quiet
         } else {
-          logger.error(error.messageWithHelp)
+          logger.error(error.messageWithHelp || error.message)
         }
       }
 

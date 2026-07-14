@@ -1,6 +1,7 @@
 const Session = require('../../../db/session')
 const ArmorKeyring = require('../../services/armorKeyring')
 const armoredKeyDisplay = require('../../helpers/armoredKeyDisplay')
+const isNetworkError = require('../../helpers/isNetworkError')
 
 async function index (publicKeyHex, options = {}) {
   const sesh = new Session()
@@ -23,7 +24,15 @@ async function index (publicKeyHex, options = {}) {
     }
   }
 
-  return await keyring.run() // { "publicKey": "privateKey" }
+  try {
+    return await keyring.run() // { "publicKey": "privateKey" }
+  } catch (error) {
+    if (isNetworkError(error)) {
+      return {}
+    }
+
+    throw error
+  }
 }
 
 module.exports = index

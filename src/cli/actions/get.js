@@ -53,7 +53,7 @@ async function get (key) {
       }
 
       errorCount += 1
-      logger.error(error.messageWithHelp)
+      logger.error(error.messageWithHelp || error.message)
     }
 
     if (spinner) spinner.stop()

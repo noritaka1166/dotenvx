@@ -17,7 +17,7 @@ function precommit (directory) {
     } = new Precommit(directory, options).run()
 
     for (const warning of warnings) {
-      logger.warn(warning.messageWithHelp)
+      logger.warn(warning.messageWithHelp || warning.message)
     }
 
     logger.success(successMessage)

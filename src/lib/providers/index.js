@@ -5,8 +5,8 @@ const nativeProvider = require('./native/index')
 
 function syncArmorProvider (publicKeyHex) {
   const { createSyncFn } = require('@dotenvx/tooling')
-  const runProviderSync = createSyncFn(require.resolve('./worker.js'))
-  return runProviderSync(require.resolve('./armor/index'), publicKeyHex)
+  const runProviderSync = createSyncFn(require.resolve('./provider-worker.js'))
+  return runProviderSync(publicKeyHex)
 }
 
 function hasKey (keyring, publicKeyHex) {

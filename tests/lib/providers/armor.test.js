@@ -89,3 +89,58 @@ t.test('armor provider returns an empty keyring when armor has no matching keys'
   ct.same(ring, {})
   ct.end()
 })
+
+t.test('armor provider returns an empty keyring when Armor is offline', async ct => {
+  class SessionStub {
+    hostname () {
+      return 'https://armor.example.com'
+    }
+
+    token () {
+      return 'token-1'
+    }
+
+    devicePublicKey () {
+      return 'device-public-key'
+    }
+  }
+  class ArmorKeyringStub {
+    async run () {
+      const error = new Error('getaddrinfo ENOTFOUND armor.example.com')
+      error.code = 'ENOTFOUND'
+      throw error
+    }
+  }
+  const provider = proxyquire('../../../src/lib/providers/armor/index', {
+    '../../../db/session': SessionStub,
+    '../../services/armorKeyring': ArmorKeyringStub
+  })
+
+  const ring = await provider('public-key')
+
+  ct.same(ring, {})
+  ct.end()
+})
+
+t.test('armor provider preserves Armor API errors', async ct => {
+  const expectedError = new Error('[SERVER_SIDE_DECRYPTION_REQUIRED] server-side decryption required')
+  expectedError.code = 'SERVER_SIDE_DECRYPTION_REQUIRED'
+
+  class SessionStub {
+    hostname () {}
+    token () {}
+    devicePublicKey () {}
+  }
+  class ArmorKeyringStub {
+    async run () {
+      throw expectedError
+    }
+  }
+  const provider = proxyquire('../../../src/lib/providers/armor/index', {
+    '../../../db/session': SessionStub,
+    '../../services/armorKeyring': ArmorKeyringStub
+  })
+
+  await ct.rejects(provider('public-key'), expectedError)
+  ct.end()
+})

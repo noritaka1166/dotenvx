@@ -1,6 +1,6 @@
 const fsx = require('./../helpers/fsx')
 const path = require('path')
-const { encrypted, parse, parseSync } = require('@dotenvx/primitives')
+const { encrypted } = require('@dotenvx/primitives')
 
 const TYPE_ENV = 'env'
 const TYPE_ENV_FILE = 'envFile'
@@ -10,6 +10,8 @@ const detectEncoding = require('./../helpers/detectEncoding')
 const detectEncodingSync = require('./../helpers/detectEncodingSync')
 const keynames = require('./../conventions/keynames')
 const providers = require('./../providers')
+const decryptors = require('./../decryptors')
+const parseWithDecryptor = require('./../helpers/parseWithDecryptor')
 
 function unresolvedEncryptedErrors (parsed) {
   const keys = []
@@ -48,7 +50,7 @@ function inject (processEnv, parsed) {
   }
 }
 
-function buildParseOptions ({ processEnv, overload, envKeysFilepath, provider }) {
+function buildParseOptions ({ processEnv, overload, envKeysFilepath, provider, decryptor }) {
   const options = {
     processEnv,
     overload,
@@ -61,10 +63,14 @@ function buildParseOptions ({ processEnv, overload, envKeysFilepath, provider })
     options.provider = null
   }
 
+  if (decryptor) {
+    options.decryptor = decryptor
+  }
+
   return options
 }
 
-async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider }) {
+async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider, decryptor }) {
   const row = {}
   row.type = TYPE_ENV
   row.string = env.value
@@ -79,7 +85,8 @@ async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider
       processEnv: parseProcessEnv,
       overload,
       envKeysFilepath,
-      provider
+      provider,
+      decryptor
     })
 
     const {
@@ -87,7 +94,7 @@ async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider
       errors,
       injected,
       existed
-    } = await parse(env.value, parseOptions)
+    } = await parseWithDecryptor(env.value, parseOptions)
 
     row.parsed = parsed
     row.errors = decryptErrors(parsed, errors)
@@ -102,7 +109,7 @@ async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider
   return row
 }
 
-function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider }) {
+function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider, decryptor }) {
   const row = {}
   row.type = TYPE_ENV
   row.string = env.value
@@ -117,7 +124,8 @@ function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider }
       processEnv: parseProcessEnv,
       overload,
       envKeysFilepath,
-      provider
+      provider,
+      decryptor
     })
 
     const {
@@ -125,7 +133,7 @@ function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider }
       errors,
       injected,
       existed
-    } = parseSync(env.value, parseOptions)
+    } = parseWithDecryptor.sync(env.value, parseOptions)
 
     row.parsed = parsed
     row.errors = decryptErrors(parsed, errors)
@@ -140,7 +148,7 @@ function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider }
   return row
 }
 
-async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, provider, readableFilepaths }) {
+async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, provider, decryptor, readableFilepaths }) {
   const row = {}
   row.type = TYPE_ENV_FILE
   row.filepath = env.value
@@ -157,7 +165,8 @@ async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, prov
       processEnv,
       overload,
       envKeysFilepath: fk,
-      provider
+      provider,
+      decryptor
     })
 
     const {
@@ -165,7 +174,7 @@ async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, prov
       errors,
       injected,
       existed
-    } = await parse(src, parseOptions)
+    } = await parseWithDecryptor(src, parseOptions)
 
     row.src = src
     row.parsed = parsed
@@ -185,7 +194,7 @@ async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, prov
   return row
 }
 
-function injectEnvFileSync ({ env, overload, processEnv, envKeysFilepath, provider, readableFilepaths }) {
+function injectEnvFileSync ({ env, overload, processEnv, envKeysFilepath, provider, decryptor, readableFilepaths }) {
   const row = {}
   row.type = TYPE_ENV_FILE
   row.filepath = env.value
@@ -202,7 +211,8 @@ function injectEnvFileSync ({ env, overload, processEnv, envKeysFilepath, provid
       processEnv,
       overload,
       envKeysFilepath: fk,
-      provider
+      provider,
+      decryptor
     })
 
     const {
@@ -210,7 +220,7 @@ function injectEnvFileSync ({ env, overload, processEnv, envKeysFilepath, provid
       errors,
       injected,
       existed
-    } = parseSync(src, parseOptions)
+    } = parseWithDecryptor.sync(src, parseOptions)
 
     row.src = src
     row.parsed = parsed
@@ -236,6 +246,7 @@ async function envs (options = {}) {
   const processEnv = options.processEnv || process.env
   const envKeysFilepath = options.envKeysFilepath || options.envKeysFile || null
   const provider = await providers(options)
+  const decryptor = await decryptors(options)
 
   for (const env of options.envs || []) {
     if (env.type === TYPE_ENV_FILE) {
@@ -245,6 +256,7 @@ async function envs (options = {}) {
         processEnv,
         envKeysFilepath,
         provider,
+        decryptor,
         readableFilepaths
       }))
     } else if (env.type === TYPE_ENV) {
@@ -253,7 +265,8 @@ async function envs (options = {}) {
         overload: options.overload,
         processEnv,
         envKeysFilepath,
-        provider
+        provider,
+        decryptor
       }))
     }
   }
@@ -270,6 +283,7 @@ function envsSync (options = {}) {
   const processEnv = options.processEnv || process.env
   const envKeysFilepath = options.envKeysFilepath || options.envKeysFile || null
   const provider = providers.sync(options)
+  const decryptor = decryptors.sync(options)
 
   for (const env of options.envs || []) {
     if (env.type === TYPE_ENV_FILE) {
@@ -279,6 +293,7 @@ function envsSync (options = {}) {
         processEnv,
         envKeysFilepath,
         provider,
+        decryptor,
         readableFilepaths
       }))
     } else if (env.type === TYPE_ENV) {
@@ -287,7 +302,8 @@ function envsSync (options = {}) {
         overload: options.overload,
         processEnv,
         envKeysFilepath,
-        provider
+        provider,
+        decryptor
       }))
     }
   }
