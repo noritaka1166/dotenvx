@@ -4,8 +4,8 @@ const armorDecryptor = require('./armor/index')
 
 function syncArmorDecryptor (src, options) {
   const { createSyncFn } = require('@dotenvx/tooling')
-  const runDecryptorSync = createSyncFn(require.resolve('./worker.js'))
-  return runDecryptorSync(require.resolve('./armor/index'), src, options)
+  const runDecryptorSync = createSyncFn(require.resolve('./decryptor-worker.js'))
+  return runDecryptorSync(src, options)
 }
 
 function armorDecryptorForOptions (options) {

@@ -78,7 +78,6 @@ t.test('decryptors.sync runs the Armor decryptor through a worker', ct => {
   ct.same(result, { src: 'HELLO=World\n' })
   ct.equal(createSyncFn.callCount, 1)
   ct.match(runDecryptorSync.firstCall.args, [
-    /decryptors\/armor\/index\.js$/,
     'HELLO=encrypted:ciphertext\n',
     {
       publicKey: 'public-key',
