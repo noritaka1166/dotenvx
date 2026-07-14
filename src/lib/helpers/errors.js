@@ -20,6 +20,7 @@ const ISSUE_BY_CODE = {
   MISSING_PRIVATE_KEY: 'https://github.com/dotenvx/dotenvx/issues/464',
   MISSING_PUBLIC_KEY: 'https://github.com/dotenvx/dotenvx/issues/865',
   MISSING_VALUE: 'https://github.com/dotenvx/dotenvx/issues/864',
+  FILE_NOT_WRITABLE: 'https://github.com/dotenvx/dotenvx/issues/890',
   PRECOMMIT_HOOK_MODIFY_FAILED: 'try again or report error',
   WRONG_PRIVATE_KEY: 'https://github.com/dotenvx/dotenvx/issues/466'
 }
@@ -270,6 +271,19 @@ class Errors {
   missingPublicKey () {
     const code = 'MISSING_PUBLIC_KEY'
     const message = `[${code}] missing public key`
+    const help = `fix: [${ISSUE_BY_CODE[code]}]`
+
+    const e = new Error(message)
+    e.code = code
+    e.help = help
+    e.messageWithHelp = `${message}. ${help}`
+    return e
+  }
+
+  fileNotWritable () {
+    const code = 'FILE_NOT_WRITABLE'
+    const filepath = this.filepath || 'unknown'
+    const message = `[${code}] cannot write to file (${filepath})`
     const help = `fix: [${ISSUE_BY_CODE[code]}]`
 
     const e = new Error(message)

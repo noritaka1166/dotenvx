@@ -62,3 +62,14 @@ t.test('#errors missingPublicKey', ct => {
 
   ct.end()
 })
+
+t.test('#errors fileNotWritable', ct => {
+  const result = new Errors({ filepath: 'C:\\Windows\\System32\\.env.keys' }).fileNotWritable()
+
+  t.equal(result.code, 'FILE_NOT_WRITABLE')
+  t.equal(result.message, '[FILE_NOT_WRITABLE] cannot write to file (C:\\Windows\\System32\\.env.keys)')
+  t.equal(result.help, 'fix: [https://github.com/dotenvx/dotenvx/issues/890]')
+  t.equal(result.messageWithHelp, '[FILE_NOT_WRITABLE] cannot write to file (C:\\Windows\\System32\\.env.keys). fix: [https://github.com/dotenvx/dotenvx/issues/890]')
+
+  ct.end()
+})
