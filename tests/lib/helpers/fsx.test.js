@@ -51,10 +51,42 @@ t.test('#writeFileXSync', ct => {
   ct.end()
 })
 
+t.test('#writeFileXSync translates permission errors', ct => {
+  const error = new Error('permission denied')
+  error.code = 'EPERM'
+  writeFileSyncStub.throws(error)
+
+  t.throws(
+    () => fsx.writeFileXSync('C:\\Windows\\System32\\.env.keys', 'hello'),
+    {
+      code: 'FILE_NOT_WRITABLE',
+      message: '[FILE_NOT_WRITABLE] cannot write to file (C:\\Windows\\System32\\.env.keys)'
+    }
+  )
+
+  ct.end()
+})
+
 t.test('#writeFileX', async ct => {
   await fsx.writeFileX('tests/somefile.txt', 'hello')
 
   t.ok(writeFileStub.calledWith('tests/somefile.txt', 'hello', 'utf8'), 'fs.promises.writeFile() called with utf8')
+
+  ct.end()
+})
+
+t.test('#writeFileX translates permission errors', async ct => {
+  const error = new Error('permission denied')
+  error.code = 'EACCES'
+  writeFileStub.rejects(error)
+
+  await t.rejects(
+    fsx.writeFileX('/protected/.env', 'hello'),
+    {
+      code: 'FILE_NOT_WRITABLE',
+      message: '[FILE_NOT_WRITABLE] cannot write to file (/protected/.env)'
+    }
+  )
 
   ct.end()
 })

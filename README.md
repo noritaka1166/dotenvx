@@ -1472,6 +1472,24 @@ $ dotenvx run -fk .env.keys -f apps/app1/.env -- yourcommand
 ```
 
 </details>
+<details><summary>`run --redact`</summary><br>
+
+Redact successfully decrypted values from the command's stdout and stderr. The command still receives the real values; only its output is filtered.
+
+```sh
+$ touch .env
+$ dotenvx set SECRET super-secret-value
+$ echo "console.log(process.env.SECRET)" > index.js
+
+$ dotenvx run --redact --quiet -- node index.js
+[REDACTED]
+```
+
+Redaction is off by default. It applies only to values that were encrypted, successfully decrypted, and injected. Plaintext values are left unchanged. Matching is exact, so transformed or derived values are not redacted.
+
+Because redaction filters stdout and stderr, interactive commands that require a TTY may behave differently.
+
+</details>
 <details><summary>`run --mask`</summary><br>
 
 Inject masked values into the command. By default, up to the first six characters are visible.

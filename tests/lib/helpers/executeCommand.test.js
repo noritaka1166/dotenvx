@@ -21,6 +21,24 @@ t.test('executeCommand - success', async ct => {
   ct.end()
 })
 
+t.test('executeCommand - redacts stdout and stderr even when attached to a TTY', async ct => {
+  const child = {
+    exitCode: 0,
+    stdout: { on: sinon.stub(), once: sinon.stub() },
+    stderr: { on: sinon.stub(), once: sinon.stub() }
+  }
+  const execaStub = sinon.stub(execute, 'execa').returns(child)
+
+  await executeCommand(['node', 'index.js'], { HELLO: 'secret' }, ['secret'])
+
+  ct.same(execaStub.firstCall.args[2].stdio, ['inherit', 'pipe', 'pipe'])
+  ct.equal(execaStub.firstCall.args[2].buffer, false)
+  ct.ok(child.stdout.on.calledWith('data'), 'stdout is intercepted')
+  ct.ok(child.stderr.on.calledWith('data'), 'stderr is intercepted')
+
+  ct.end()
+})
+
 t.test('executeCommand - exitCode 1', async ct => {
   const execaStub = sinon.stub(execute, 'execa').returns({ exitCode: 1 })
   const processExitStub = sinon.stub(process, 'exit')

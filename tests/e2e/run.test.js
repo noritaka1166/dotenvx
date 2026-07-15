@@ -72,7 +72,7 @@ t.test('#run', ct => {
   ct.equal(execShell(`${dotenvx} run --quiet -- ${command}`).stdout, 'Hello World') // --quiet
   ct.equal(execShell(`DOTENV_CONFIG_QUIET=true ${dotenvx} run -- ${command}`).stdout, 'Hello World') // DOTENV_CONFIG_QUIET=true
   ct.equal(execShell(`${dotenvx} run --debug -- ${command}`).stdout, modernizeDebugOutput(`Setting log level to debug
-options: {"env":[],"envFile":[],"strict":false,"armor":true,"native":true}
+options: {"env":[],"envFile":[],"strict":false,"redact":false,"armor":true,"native":true}
 process command [${node} index.js]
 loading env from .env (${tempDir}/.env)
 {"HELLO":"World"}
@@ -97,7 +97,7 @@ t.test('#run - multiple .env files', ct => {
   ct.equal(execShell(`${dotenvx} run -f .env.local -f .env -- ${command}`).stdout, '⟐ injected env (1) from .env.local, .env\nHello local')
   ct.equal(execShell(`${dotenvx} run -f .env.local -f .env --quiet -- ${command}`).stdout, 'Hello local') // --quiet
   ct.equal(execShell(`${dotenvx} run -f .env.local -f .env --debug -- ${command}`).stdout, modernizeDebugOutput(`Setting log level to debug
-options: {"env":[],"envFile":[".env.local",".env"],"strict":false,"armor":true,"native":true}
+options: {"env":[],"envFile":[".env.local",".env"],"strict":false,"redact":false,"armor":true,"native":true}
 process command [${node} index.js]
 loading env from .env.local (${tempDir}/.env.local)
 {"HELLO":"local"}
@@ -126,7 +126,7 @@ t.test('#run - multiple .env files --overload', ct => {
   ct.equal(execShell(`${dotenvx} run -f .env.local -f .env --overload -- ${command}`).stdout, '⟐ injected env (1) from .env.local, .env\nHello World')
   ct.equal(execShell(`${dotenvx} run -f .env.local -f .env --overload --quiet -- ${command}`).stdout, 'Hello World') // --quiet
   ct.equal(execShell(`${dotenvx} run -f .env.local -f .env --overload --debug -- ${command}`).stdout, modernizeDebugOutput(`Setting log level to debug
-options: {"env":[],"envFile":[".env.local",".env"],"strict":false,"armor":true,"native":true,"overload":true}
+options: {"env":[],"envFile":[".env.local",".env"],"strict":false,"redact":false,"armor":true,"native":true,"overload":true}
 process command [${node} index.js]
 loading env from .env.local (${tempDir}/.env.local)
 {"HELLO":"local"}
@@ -181,7 +181,7 @@ t.test('#run - --env', ct => {
   ct.equal(execShell(`${dotenvx} run --env HELLO=String -f .env -- ${command}`).stdout, '⟐ injected env (1) from .env, and --env flag\nHello String')
   ct.equal(execShell(`${dotenvx} run --env HELLO=String -f .env --quiet -- ${command}`).stdout, 'Hello String') // --quiet
   ct.equal(execShell(`${dotenvx} run --env HELLO=String -f .env --debug -- ${command}`).stdout, modernizeDebugOutput(`Setting log level to debug
-options: {"env":["HELLO=String"],"envFile":[".env"],"strict":false,"armor":true,"native":true}
+options: {"env":["HELLO=String"],"envFile":[".env"],"strict":false,"redact":false,"armor":true,"native":true}
 process command [${node} index.js]
 loading env from string (HELLO=String)
 {"HELLO":"String"}
@@ -213,7 +213,7 @@ t.test('#run - encrypted .env', ct => {
   ct.equal(execShell(`${dotenvx} run -- ${command}`).stdout, '⟐ injected env (2) from .env\nHello encrypted')
   ct.equal(execShell(`${dotenvx} run --quiet -- ${command}`).stdout, 'Hello encrypted') // --quiet
   ct.equal(execShell(`${dotenvx} run --debug -- ${command}`).stdout, modernizeDebugOutput(`Setting log level to debug
-options: {"env":[],"envFile":[],"strict":false,"armor":true,"native":true}
+options: {"env":[],"envFile":[],"strict":false,"redact":false,"armor":true,"native":true}
 process command [${node} index.js]
 loading env from .env (${tempDir}/.env)
 {"DOTENV_PUBLIC_KEY":"${DOTENV_PUBLIC_KEY}","HELLO":"encrypted"}
@@ -255,7 +255,7 @@ t.test('#run - encrypted .env with no .env.keys', ct => {
   o = execShell(`${dotenvx} run --debug -- ${command}`)
   ct.equal(o.stderr, '☠ [DECRYPTION_FAILED] could not decrypt HELLO. fix: [https://github.com/dotenvx/dotenvx/issues/757]')
   ct.equal(o.stdout, modernizeDebugOutput(`Setting log level to debug
-options: {"env":[],"envFile":[],"strict":false,"armor":true,"native":true}
+options: {"env":[],"envFile":[],"strict":false,"redact":false,"armor":true,"native":true}
 process command [${node} index.js]
 loading env from .env (${tempDir}/.env)
 {"DOTENV_PUBLIC_KEY":"${DOTENV_PUBLIC_KEY}","HELLO":"${encrypted}"}
@@ -311,6 +311,46 @@ t.test('#run - encrypted .env.production with no .env.keys, with DOTENV_PRIVATE_
   const command = `${node} index.js`
   ct.equal(execShell(`DOTENV_PRIVATE_KEY_PRODUCTION=${DOTENV_PRIVATE_KEY_PRODUCTION} ${dotenvx} run -- ${command}`).stdout, '⟐ injected env (2) from .env.production\nHello production')
   ct.equal(execShell(`${dotenvx} run --quiet -- ${command}`).stdout, 'Hello production') // --quiet
+
+  ct.end()
+})
+
+t.test('#run - redacts decrypted values from stdout and stderr but preserves plaintext values', ct => {
+  execShell(`
+    touch .env
+    ${dotenvx} set SECRET super-secret-value
+    echo "PUBLIC=public-value" >> .env
+    echo "process.stdout.write('stdout ' + process.env.SECRET + ' ' + process.env.PUBLIC); process.stderr.write('stderr ' + process.env.SECRET + ' ' + process.env.PUBLIC)" > index.js
+  `)
+
+  const command = `${node} index.js`
+  const output = execShell(`${dotenvx} run --quiet --redact -- ${command}`)
+
+  ct.equal(output.stdout, 'stdout [REDACTED] public-value')
+  ct.equal(output.stderr, 'stderr [REDACTED] public-value')
+  ct.notMatch(output.stdout, /super-secret-value/)
+  ct.notMatch(output.stderr, /super-secret-value/)
+
+  const unredactedOutput = execShell(`${dotenvx} run --quiet -- ${command}`)
+  ct.equal(unredactedOutput.stdout, 'stdout super-secret-value public-value')
+  ct.equal(unredactedOutput.stderr, 'stderr super-secret-value public-value')
+
+  ct.end()
+})
+
+t.test('#run - redacts decrypted values repeated in command failure diagnostics', ct => {
+  execShell(`
+    touch .env
+    ${dotenvx} set SECRET super-secret-value
+    echo "process.stderr.write(process.env.SECRET); process.exit(1)" > index.js
+  `)
+
+  const command = `${node} index.js`
+  const output = execShell(`${dotenvx} run --quiet --redact -- ${command}`)
+
+  ct.match(output.stderr, /\[REDACTED\]/)
+  ct.notMatch(output.stderr, /super-secret-value/)
+  ct.equal(output.exitCode, 1)
 
   ct.end()
 })

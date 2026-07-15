@@ -1,4 +1,5 @@
 const fs = require('fs')
+const Errors = require('./errors')
 
 const ENCODING = 'utf8'
 
@@ -19,11 +20,27 @@ function readFileXSync (filepath, encoding = null) {
 }
 
 function writeFileXSync (filepath, str) {
-  return fs.writeFileSync(filepath, str, ENCODING) // utf8 always
+  try {
+    return fs.writeFileSync(filepath, str, ENCODING) // utf8 always
+  } catch (error) {
+    if (error.code === 'EACCES' || error.code === 'EPERM') {
+      throw new Errors({ filepath }).fileNotWritable()
+    }
+
+    throw error
+  }
 }
 
 async function writeFileX (filepath, str) {
-  return fs.promises.writeFile(filepath, str, ENCODING)
+  try {
+    return await fs.promises.writeFile(filepath, str, ENCODING)
+  } catch (error) {
+    if (error.code === 'EACCES' || error.code === 'EPERM') {
+      throw new Errors({ filepath }).fileNotWritable()
+    }
+
+    throw error
+  }
 }
 
 async function exists (filepath) {

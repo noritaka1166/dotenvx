@@ -93,7 +93,7 @@ t.test('catchAndLog - other error with help/debug', (ct) => {
   ct.end()
 })
 
-t.test('catchAndLog - filesystem permission error', (ct) => {
+t.test('catchAndLog preserves filesystem permission errors', (ct) => {
   const loggerErrorStub = sinon.stub(logger, 'error')
   const loggerDebugStub = sinon.stub(logger, 'debug')
   const error = new Error("EPERM: operation not permitted, open 'C:\\Windows\\System32\\.env.keys'")
@@ -102,8 +102,8 @@ t.test('catchAndLog - filesystem permission error', (ct) => {
 
   catchAndLog(error)
 
-  ct.ok(loggerErrorStub.calledWith('[FILE_NOT_WRITABLE] cannot write to file (C:\\Windows\\System32\\.env.keys). fix: [https://github.com/dotenvx/dotenvx/issues/890]'))
-  ct.ok(loggerDebugStub.calledWith('ERROR_CODE: FILE_NOT_WRITABLE'))
+  ct.ok(loggerErrorStub.calledWith("EPERM: operation not permitted, open 'C:\\Windows\\System32\\.env.keys'"))
+  ct.ok(loggerDebugStub.calledWith('ERROR_CODE: EPERM'))
   ct.end()
 })
 
