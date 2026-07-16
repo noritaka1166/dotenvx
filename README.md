@@ -1454,6 +1454,31 @@ Hello production
 Available log levels are `error, warn, info, verbose, debug, silly` ([source](https://docs.npmjs.com/cli/v8/using-npm/logging#setting-log-levels))
 
 </details>
+<details><summary>`run --validate`</summary><br>
+
+Validate your environment against `.env.example`.
+
+```ini
+# .env.example
+DATABASE_URL=
+API_KEY=
+SENTRY_DSN= # optional
+```
+
+```sh
+$ dotenvx run --validate -- node index.js
+[VALIDATION_FAILED] missing required (DATABASE_URL, API_KEY). fix: [https://github.com/dotenvx/dotenvx/issues/907]
+```
+
+Validation errors are reported without stopping your command. Combine `--validate` with `--strict` to exit with code `1` before the command runs.
+
+```sh
+$ dotenvx run --validate --strict -- node index.js
+```
+
+Any inline comment containing the word `optional` marks that key as optional. If `.env.example` is missing, dotenvx reports `MISSING_ENV_EXAMPLE`. An empty `.env.example` is valid and declares no required variables.
+
+</details>
 <details><summary>`run --strict`</summary><br>
 
 Exit with code `1` if any errors are encountered - like a missing .env file or decryption failure.
