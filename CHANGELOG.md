@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.13.0...main)
+[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.14.0...main)
+
+## [2.14.0](https://github.com/dotenvx/dotenvx/compare/v2.13.0...v2.14.0) (2026-07-16)
+
+### Added
+
+* Add `dotenvx run --validate` for simple env validation against your `.env.example` ([#906](https://github.com/dotenvx/dotenvx/pull/906))
+* Add `dotenvx validate` for a pre-check of validation against your `.env.example` file ([#906](https://github.com/dotenvx/dotenvx/pull/906))
 
 ## [2.13.0](https://github.com/dotenvx/dotenvx/compare/v2.12.0...v2.13.0) (2026-07-16)
 
