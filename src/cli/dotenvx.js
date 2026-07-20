@@ -259,7 +259,7 @@ program.command('update')
   })
 
 // dotenvx curl
-program.command('curl')
+program.command('curl', { hidden: true })
   .description('make an authenticated dotenvx API request')
   .argument('<url>', 'dotenvx API URL')
   .option('-X, --request <method>', 'HTTP request method')
