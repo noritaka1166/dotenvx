@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.15.0...main)
+[Unreleased](https://github.com/dotenvx/dotenvx/compare/v2.15.1...main)
+
+## [2.15.1](https://github.com/dotenvx/dotenvx/compare/v2.15.0...v2.15.1) (2026-07-20)
+
+### Changed
+
+* Better communicate time waiting on 1password with elapsed time ([#909](https://github.com/dotenvx/dotenvx/pull/909))
 
 ## [2.15.0](https://github.com/dotenvx/dotenvx/compare/v2.14.0...v2.15.0) (2026-07-20)
 
