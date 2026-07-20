@@ -154,6 +154,15 @@ Hello [REDACTED]
 see [Codex redaction guide](https://dotenvx.com/docs/cli/run-redact-codex-exec)
 
 </details>
+<details><summary>1Password 🔐</summary><br>
+
+```sh
+$ echo "HELLO=op://Personal/hello/password" > .env
+$ dotenvx run -- sh -c 'echo Hello $HELLO'
+Hello World
+```
+
+</details>
 <details><summary>TypeScript 📘</summary><br>
 
 ```json
@@ -958,30 +967,6 @@ Keep `.env.keys` unreadable by agents, while still letting them safely update en
 
 Advanced CLI commands.
 
-<details><summary>`run` - 1Password secret references</summary><br>
-
-Resolve [1Password secret references](https://developer.1password.com/docs/cli/secrets-reference-syntax/) directly from your `.env` file.
-
-```ini
-# .env
-API_KEY=op://Personal/my_api_key/password
-```
-
-Install the [1Password CLI](https://developer.1password.com/docs/cli/get-started/) and authenticate with `op`. Dotenvx automatically reads `op://` values through `op read` before injecting them.
-
-```sh
-$ dotenvx run -- node index.js
-```
-
-Use `--no-1password` to leave `op://` values unresolved.
-
-```sh
-$ dotenvx run --no-1password -- node index.js
-```
-
-The same flag is available for `dotenvx get` and `dotenvx validate`.
-
-</details>
 <details><summary>`run` - Variable Expansion</summary><br>
 
 Reference and expand variables already on your machine for use in your .env file.
@@ -1179,6 +1164,30 @@ $ echo "HELLO=World" > .env
 $ dotenvx get GOODBYE
 [MISSING_KEY] missing key (GOODBYE)
 ```
+
+</details>
+<details><summary>`run` - 1Password</summary><br>
+
+Resolve [1Password op://](https://developer.1password.com/docs/cli/secrets-reference-syntax/) directly from your `.env` file.
+
+```ini
+# .env
+API_KEY=op://Personal/my_api_key/password
+```
+
+Install the [1Password CLI](https://developer.1password.com/docs/cli/get-started/) and authenticate with `op`. Dotenvx automatically reads `op://` values through `op read` before injecting them.
+
+```sh
+$ dotenvx run -- node index.js
+```
+
+Use `--no-1password` to leave `op://` values unresolved.
+
+```sh
+$ dotenvx run --no-1password -- node index.js
+```
+
+The same flag is available for `dotenvx get` and `dotenvx validate`.
 
 </details>
 <details><summary>`run -f <directory>`</summary><br>
@@ -1501,29 +1510,6 @@ $ dotenvx run --validate --strict -- node index.js
 ```
 
 Any inline comment containing the word `optional` marks that key as optional. If `.env.example` is missing, dotenvx reports `MISSING_ENV_EXAMPLE`. An empty `.env.example` is valid and declares no required variables.
-
-</details>
-<details><summary>`validate`</summary><br>
-
-Validate `.env` file(s) against `.env.example` without running a command.
-
-```ini
-# .env.example
-DATABASE_URL=
-API_KEY=
-SENTRY_DSN= # optional
-```
-
-```sh
-$ dotenvx validate
-[VALIDATION_FAILED] missing required (DATABASE_URL, API_KEY). fix: [https://github.com/dotenvx/dotenvx/issues/907]
-```
-
-Use `-f` and `-fk` to validate a specific env file and keys file. The command exits with code `1` when validation fails and prints errors to stderr. On success, it exits with code `0`.
-
-```sh
-$ dotenvx validate -f .env.production -fk .env.keys
-```
 
 </details>
 <details><summary>`run --strict`</summary><br>
@@ -2512,6 +2498,29 @@ $ dotenvx ls --json
 ]
 
 $ dotenvx ls --json > dotenv-files.json
+```
+
+</details>
+<details><summary>`validate`</summary><br>
+
+Validate `.env` file(s) against `.env.example` without running a command.
+
+```ini
+# .env.example
+DATABASE_URL=
+API_KEY=
+SENTRY_DSN= # optional
+```
+
+```sh
+$ dotenvx validate
+[VALIDATION_FAILED] missing required (DATABASE_URL, API_KEY). fix: [https://github.com/dotenvx/dotenvx/issues/907]
+```
+
+Use `-f` and `-fk` to validate a specific env file and keys file. The command exits with code `1` when validation fails and prints errors to stderr. On success, it exits with code `0`.
+
+```sh
+$ dotenvx validate -f .env.production -fk .env.keys
 ```
 
 </details>

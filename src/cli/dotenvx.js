@@ -187,24 +187,6 @@ program.command('ls')
     return require('./actions/ls').apply(this, args)
   })
 
-// dotenvx gitignore
-program.command('gitignore')
-  .description('append to .gitignore')
-  .addHelpText('after', examples.gitignore)
-  .option('--pattern <patterns...>', 'pattern(s) to gitignore', ['.env*'])
-  .action(function (...args) {
-    return require('./actions/ext/gitignore').apply(this, args)
-  })
-
-// dotenvx genexample
-program.command('genexample')
-  .description('generate .env.example')
-  .argument('[directory]', 'directory to generate from', '.')
-  .option('-f, --env-file <paths...>', 'path(s) to your env file(s)', '.env')
-  .action(function (...args) {
-    return require('./actions/ext/genexample').apply(this, args)
-  })
-
 // dotenvx validate
 program.command('validate')
   .description('validate .env file(s) against .env.example')
@@ -222,6 +204,24 @@ program.command('validate')
   .action(function (...args) {
     this.envs = envs
     return require('./actions/validate').apply(this, args)
+  })
+
+// dotenvx gitignore
+program.command('gitignore')
+  .description('append to .gitignore')
+  .addHelpText('after', examples.gitignore)
+  .option('--pattern <patterns...>', 'pattern(s) to gitignore', ['.env*'])
+  .action(function (...args) {
+    return require('./actions/ext/gitignore').apply(this, args)
+  })
+
+// dotenvx genexample
+program.command('genexample')
+  .description('generate .env.example')
+  .argument('[directory]', 'directory to generate from', '.')
+  .option('-f, --env-file <paths...>', 'path(s) to your env file(s)', '.env')
+  .action(function (...args) {
+    return require('./actions/ext/genexample').apply(this, args)
   })
 
 // dotenvx precommit
