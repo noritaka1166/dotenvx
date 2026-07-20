@@ -982,28 +982,36 @@ $ dotenvx run --no-1password -- node index.js
 The same flag is available for `dotenvx get` and `dotenvx validate`.
 
 </details>
-<details><summary>`run` - Bitwarden Secrets Manager references</summary><br>
+<details><summary>`run` - Bitwarden secret references</summary><br>
 
-Resolve secrets from [Bitwarden Secrets Manager](https://bitwarden.com/help/secrets-manager-overview/) directly from your `.env` file using dotenvx's `bws://` reference format.
+Resolve secrets from Bitwarden Password Manager directly from your `.env` file using dotenvx's `bw://` reference format.
 
 ```ini
 # .env
-API_KEY=bws://2863ced6-eba1-48b4-b5c0-afa30104877a
+USERNAME=bw://7ac9cae8-5067-4faf-b6ab-acfd00e2c328/username
+PASSWORD=bw://7ac9cae8-5067-4faf-b6ab-acfd00e2c328/password
+LOGIN_URI=bw://7ac9cae8-5067-4faf-b6ab-acfd00e2c328/uri
 ```
 
-Install the [Bitwarden Secrets Manager CLI](https://bitwarden.com/help/secrets-manager-cli/) and configure `BWS_ACCESS_TOKEN`. Dotenvx passes the secret ID to `bws secret get` and injects the returned secret value.
+Install and unlock the [Bitwarden Password Manager CLI](https://bitwarden.com/help/cli/), then export its session into the current shell. Dotenvx supports exact item UUIDs and the `username`, `password`, and `uri` fields.
+
+```sh
+$ export BW_SESSION="$(bw unlock --raw)"
+```
+
+Dotenvx fails immediately when `BW_SESSION` is missing rather than opening an interactive master-password prompt.
 
 ```sh
 $ dotenvx run -- node index.js
 ```
 
-Use `--no-bitwarden` to leave `bws://` values unresolved.
+Use `--no-bitwarden` to leave `bw://` values unresolved.
 
 ```sh
 $ dotenvx run --no-bitwarden -- node index.js
 ```
 
-The same flag is available for `dotenvx get` and `dotenvx validate`. The `bws://` format is defined by dotenvx; Bitwarden does not provide a native secret-reference URI format.
+The same flag is available for `dotenvx get` and `dotenvx validate`. The `bw://` format is defined by dotenvx; Bitwarden does not provide a native secret-reference URI format.
 
 </details>
 <details><summary>`run` - Variable Expansion</summary><br>
@@ -3300,21 +3308,21 @@ require('@dotenvx/dotenvx').config({no1Password: true})
 </details>
 <details><summary>`config(noBitwarden:)` - noBitwarden</summary><br>
 
-By default, `config()` automatically resolves dotenvx `bws://` references through the installed [Bitwarden Secrets Manager CLI](https://bitwarden.com/help/secrets-manager-cli/).
+By default, `config()` automatically resolves dotenvx `bw://` references through the installed Bitwarden Password Manager CLI.
 
 ```ini
 # .env
-API_KEY=bws://2863ced6-eba1-48b4-b5c0-afa30104877a
+PASSWORD=bw://7ac9cae8-5067-4faf-b6ab-acfd00e2c328/password
 ```
 
 ```js
 // index.js
 require('@dotenvx/dotenvx').config()
 
-console.log(process.env.API_KEY)
+console.log(process.env.PASSWORD)
 ```
 
-Set `noBitwarden` to leave `bws://` values unresolved and avoid calling `bws`.
+Set `noBitwarden` to leave `bw://` values unresolved and avoid calling `bw`.
 
 ```js
 // index.js

@@ -13,7 +13,7 @@ const providers = require('./../providers')
 const decryptors = require('./../decryptors')
 const parseWithDecryptor = require('./../helpers/parseWithDecryptor')
 const resolveOnePassword = require('./../helpers/resolveOnePassword')
-const resolveBitwardenSecrets = require('./../helpers/resolveBitwardenSecrets')
+const resolveBitwardenPassword = require('./../helpers/resolveBitwardenPassword')
 
 function unresolvedEncryptedErrors (parsed) {
   const keys = []
@@ -111,9 +111,10 @@ async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider
     }
 
     if (!noBitwarden) {
-      const result = await resolveBitwardenSecrets(row.injected)
-      row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
+      const passwordResult = await resolveBitwardenPassword(row.injected)
+      row.errors.push(...passwordResult.errors)
+      for (const key of passwordResult.unresolved) delete row.parsed[key]
+
       Object.assign(row.parsed, row.injected)
     }
 
@@ -164,9 +165,10 @@ function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider, 
     }
 
     if (!noBitwarden) {
-      const result = resolveBitwardenSecrets.sync(row.injected)
-      row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
+      const passwordResult = resolveBitwardenPassword.sync(row.injected)
+      row.errors.push(...passwordResult.errors)
+      for (const key of passwordResult.unresolved) delete row.parsed[key]
+
       Object.assign(row.parsed, row.injected)
     }
 
@@ -220,9 +222,10 @@ async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, prov
     }
 
     if (!noBitwarden) {
-      const result = await resolveBitwardenSecrets(row.injected)
-      row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
+      const passwordResult = await resolveBitwardenPassword(row.injected)
+      row.errors.push(...passwordResult.errors)
+      for (const key of passwordResult.unresolved) delete row.parsed[key]
+
       Object.assign(row.parsed, row.injected)
     }
 
@@ -280,9 +283,10 @@ function injectEnvFileSync ({ env, overload, processEnv, envKeysFilepath, provid
     }
 
     if (!noBitwarden) {
-      const result = resolveBitwardenSecrets.sync(row.injected)
-      row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
+      const passwordResult = resolveBitwardenPassword.sync(row.injected)
+      row.errors.push(...passwordResult.errors)
+      for (const key of passwordResult.unresolved) delete row.parsed[key]
+
       Object.assign(row.parsed, row.injected)
     }
 

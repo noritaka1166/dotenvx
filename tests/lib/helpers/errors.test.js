@@ -64,12 +64,12 @@ t.test('#errors onePasswordFailed', ct => {
 })
 
 t.test('#errors bitwardenFailed', ct => {
-  const result = new Errors({ message: 'Bitwarden Secrets Manager CLI failed to resolve API_KEY' }).bitwardenFailed()
+  const result = new Errors({ message: 'Bitwarden Password Manager CLI failed to resolve API_KEY' }).bitwardenFailed()
 
   t.equal(result.code, 'BITWARDEN_FAILED')
-  t.equal(result.message, '[BITWARDEN_FAILED] Bitwarden Secrets Manager CLI failed to resolve API_KEY')
-  t.equal(result.help, 'fix: [https://bitwarden.com/help/secrets-manager-cli/]')
-  t.equal(result.messageWithHelp, '[BITWARDEN_FAILED] Bitwarden Secrets Manager CLI failed to resolve API_KEY. fix: [https://bitwarden.com/help/secrets-manager-cli/]')
+  t.equal(result.message, '[BITWARDEN_FAILED] Bitwarden Password Manager CLI failed to resolve API_KEY')
+  t.equal(result.help, 'fix: [https://bitwarden.com/help/cli/]')
+  t.equal(result.messageWithHelp, '[BITWARDEN_FAILED] Bitwarden Password Manager CLI failed to resolve API_KEY. fix: [https://bitwarden.com/help/cli/]')
 
   ct.end()
 })

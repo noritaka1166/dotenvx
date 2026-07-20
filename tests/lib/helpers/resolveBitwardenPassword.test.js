@@ -1,0 +1,154 @@
+const t = require('tap')
+const proxyquire = require('proxyquire')
+
+const ITEM_ID = '7ac9cae8-5067-4faf-b6ab-acfd00e2c328'
+
+t.beforeEach(ct => {
+  ct.context.originalSession = process.env.BW_SESSION
+  process.env.BW_SESSION = 'test-session'
+})
+
+t.afterEach(ct => {
+  if (ct.context.originalSession === undefined) {
+    delete process.env.BW_SESSION
+  } else {
+    process.env.BW_SESSION = ct.context.originalSession
+  }
+})
+
+t.test('resolves supported bw:// values asynchronously', async ct => {
+  const calls = []
+  const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
+    child_process: {
+      execFile: (command, args, options, callback) => {
+        calls.push([command, args, options])
+        callback(null, 'super-secret\n', '')
+      },
+      execFileSync: () => ct.fail('should not call execFileSync')
+    }
+  })
+  const parsed = { SECRET: `bw://${ITEM_ID}/password`, PLAIN: 'value' }
+
+  const result = await resolveBitwardenPassword(parsed)
+
+  ct.equal(parsed.SECRET, 'super-secret')
+  ct.equal(parsed.PLAIN, 'value')
+  ct.equal(calls[0][0], 'bw')
+  ct.same(calls[0][1], ['get', 'password', ITEM_ID])
+  ct.same(result, { errors: [], unresolved: [] })
+})
+
+t.test('resolves username, password, and uri synchronously without a shell', ct => {
+  const calls = []
+  const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
+    child_process: {
+      execFile: () => ct.fail('should not call execFile'),
+      execFileSync: (command, args, options) => {
+        calls.push([command, args, options])
+        return `${args[1]}-value\n`
+      }
+    }
+  })
+  const parsed = {
+    USERNAME: `bw://${ITEM_ID}/username`,
+    PASSWORD: `bw://${ITEM_ID}/password`,
+    URI: `bw://${ITEM_ID}/uri`
+  }
+
+  const result = resolveBitwardenPassword.sync(parsed)
+
+  ct.same(parsed, {
+    USERNAME: 'username-value',
+    PASSWORD: 'password-value',
+    URI: 'uri-value'
+  })
+  ct.same(calls.map(call => call[1]), [
+    ['get', 'username', ITEM_ID],
+    ['get', 'password', ITEM_ID],
+    ['get', 'uri', ITEM_ID]
+  ])
+  ct.same(result, { errors: [], unresolved: [] })
+  ct.end()
+})
+
+t.test('rejects unsupported fields before calling bw', ct => {
+  const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
+    child_process: {
+      execFile: () => ct.fail('should not call execFile'),
+      execFileSync: () => ct.fail('should not call execFileSync')
+    }
+  })
+  const parsed = { TOTP: `bw://${ITEM_ID}/totp`, PLAIN: 'value' }
+
+  const result = resolveBitwardenPassword.sync(parsed)
+
+  ct.same(parsed, { PLAIN: 'value' })
+  ct.match(result.errors[0], {
+    code: 'BITWARDEN_FAILED',
+    message: '[BITWARDEN_FAILED] unsupported Bitwarden Password Manager field totp for TOTP'
+  })
+  ct.end()
+})
+
+t.test('requires an exact item UUID before calling bw', ct => {
+  const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
+    child_process: {
+      execFile: () => ct.fail('should not call execFile'),
+      execFileSync: () => ct.fail('should not call execFileSync')
+    }
+  })
+  const parsed = { PASSWORD: 'bw://GitHub/password', PLAIN: 'value' }
+
+  const result = resolveBitwardenPassword.sync(parsed)
+
+  ct.same(parsed, { PLAIN: 'value' })
+  ct.match(result.errors[0], {
+    code: 'BITWARDEN_FAILED',
+    message: '[BITWARDEN_FAILED] invalid Bitwarden Password Manager reference for PASSWORD'
+  })
+  ct.end()
+})
+
+t.test('reports and omits a missing bw CLI without exposing the reference', ct => {
+  const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
+    child_process: {
+      execFile: () => ct.fail('should not call execFile'),
+      execFileSync: () => {
+        const error = new Error('spawn bw ENOENT private-reference')
+        error.code = 'ENOENT'
+        throw error
+      }
+    }
+  })
+  const parsed = { PASSWORD: `bw://${ITEM_ID}/password`, PLAIN: 'value' }
+
+  const result = resolveBitwardenPassword.sync(parsed)
+
+  ct.same(parsed, { PLAIN: 'value' })
+  ct.match(result.errors[0], {
+    code: 'BITWARDEN_FAILED',
+    message: '[BITWARDEN_FAILED] Bitwarden Password Manager CLI is not installed and could not resolve PASSWORD',
+    help: 'fix: [https://bitwarden.com/help/cli/]'
+  })
+  ct.end()
+})
+
+t.test('fails immediately when BW_SESSION is missing instead of prompting', ct => {
+  delete process.env.BW_SESSION
+  const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
+    child_process: {
+      execFile: () => ct.fail('should not call execFile'),
+      execFileSync: () => ct.fail('should not call execFileSync')
+    }
+  })
+  const parsed = { API_KEY: `bw://${ITEM_ID}/password`, PLAIN: 'value' }
+
+  const result = resolveBitwardenPassword.sync(parsed)
+
+  ct.same(parsed, { PLAIN: 'value' })
+  ct.match(result.errors[0], {
+    code: 'BITWARDEN_FAILED',
+    message: '[BITWARDEN_FAILED] Bitwarden Password Manager is locked and could not resolve API_KEY; run \'export BW_SESSION="$(bw unlock --raw)"\''
+  })
+  ct.end()
+})
