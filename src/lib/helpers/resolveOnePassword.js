@@ -22,7 +22,7 @@ function resolutionError (key, error) {
   return new Errors({ message }).onePasswordFailed()
 }
 
-async function resolveOnePassword (parsed) {
+async function resolveOnePassword (parsed, options = {}) {
   const errors = []
   const unresolved = []
 
@@ -30,6 +30,7 @@ async function resolveOnePassword (parsed) {
     if (!isSecretReference(value)) continue
 
     try {
+      if (options.onStatus) options.onStatus('awaiting 1password')
       const stdout = await execFileAsync('op', ['read', value, '--no-newline'], {
         encoding: 'utf8',
         windowsHide: true
@@ -39,6 +40,8 @@ async function resolveOnePassword (parsed) {
       errors.push(resolutionError(key, error))
       unresolved.push(key)
       delete parsed[key]
+    } finally {
+      if (options.onStatus) options.onStatus('injecting')
     }
   }
 
