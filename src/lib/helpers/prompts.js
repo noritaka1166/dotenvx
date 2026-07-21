@@ -1,4 +1,5 @@
 const { Enquirer } = require('@dotenvx/tooling')
+const Errors = require('./errors')
 
 const enquirer = new Enquirer()
 
@@ -76,9 +77,7 @@ async function password ({ message, prefix, separator }, context) {
     const onData = (chunk) => {
       for (const character of chunk.toString('utf8')) {
         if (character === '\u0003' || character === '\u0004') {
-          const error = new Error('prompt cancelled')
-          error.code = 'PROMPT_CANCELLED'
-          return finish(error)
+          return finish(new Errors().promptCancelled())
         }
 
         if (character === '\r' || character === '\n') return finish()

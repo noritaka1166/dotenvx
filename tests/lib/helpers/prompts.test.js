@@ -92,7 +92,10 @@ t.test('password restores the terminal and rejects cleanly on ctrl-c', async ct 
 
   input.write('\u0003')
 
-  await ct.rejects(pending, { code: 'PROMPT_CANCELLED' })
+  await ct.rejects(pending, {
+    code: 'PROMPT_CANCELLED',
+    message: '[PROMPT_CANCELLED] prompt cancelled'
+  })
   ct.same(rawModes, [true, false])
   ct.equal(input.listenerCount('data'), 0)
   ct.match(rendered, /^◇ Bitwarden master password = /)

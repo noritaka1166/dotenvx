@@ -74,6 +74,17 @@ t.test('#errors bitwardenFailed', ct => {
   ct.end()
 })
 
+t.test('#errors promptCancelled', ct => {
+  const result = new Errors().promptCancelled()
+
+  t.equal(result.code, 'PROMPT_CANCELLED')
+  t.equal(result.message, '[PROMPT_CANCELLED] prompt cancelled')
+  t.notOk(result.help)
+  t.notOk(result.messageWithHelp)
+
+  ct.end()
+})
+
 t.test('#errors missingEnvKeysFile falls back to .env.keys', ct => {
   const result = new Errors({}).missingEnvKeysFile()
 
