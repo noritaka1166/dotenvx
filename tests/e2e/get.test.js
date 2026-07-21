@@ -77,3 +77,38 @@ t.test('#get (json)', ct => {
 
   ct.end()
 })
+
+t.test('#get --include-key', ct => {
+  execShell(`
+    printf "HELLO=World\nHOLA=Mundo\nGOODBYE=World" > .env
+  `)
+
+  ct.equal(execShell(`${dotenvx} get -ik 'H*'`), '{"HELLO":"World","HOLA":"Mundo"}')
+  ct.equal(execShell(`${dotenvx} get --include-key HELLO GOODBYE`), '{"HELLO":"World","GOODBYE":"World"}')
+
+  ct.end()
+})
+
+t.test('#get --exclude-key', ct => {
+  execShell(`
+    printf "DOTENV_PUBLIC_KEY=public\nDOTENV_PUBLIC_KEY_PRODUCTION=production\nHELLO=World" > .env
+  `)
+
+  ct.equal(execShell(`${dotenvx} get -ek 'DOTENV_PUBLIC_KEY*'`), '{"HELLO":"World"}')
+  ct.equal(execShell(`${dotenvx} get --format=shell --exclude-key 'DOTENV_PUBLIC_KEY*'`), 'HELLO=World')
+  ct.equal(execShell(`${dotenvx} get --format=colon -ek 'DOTENV_PUBLIC_KEY*'`), 'HELLO:World')
+  ct.equal(execShell(`${dotenvx} get --format=eval -ek 'DOTENV_PUBLIC_KEY*'`), "HELLO='World'")
+  ct.equal(execShell(`${dotenvx} get --format=eval-export -ek 'DOTENV_PUBLIC_KEY*'`), "export HELLO='World'")
+
+  ct.end()
+})
+
+t.test('#get --include-key --exclude-key', ct => {
+  execShell(`
+    printf "HELLO=World\nHOLA=Mundo\nGOODBYE=World" > .env
+  `)
+
+  ct.equal(execShell(`${dotenvx} get -ik 'H*' -ek HOLA`), '{"HELLO":"World"}')
+
+  ct.end()
+})

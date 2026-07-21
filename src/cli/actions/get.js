@@ -9,6 +9,7 @@ const normalizeDotenvConfigConvention = require('../../lib/helpers/normalizeDote
 const buildCommandEnvs = require('../../lib/helpers/buildCommandEnvs')
 const resolveEnvKeysFile = require('../../lib/helpers/resolveEnvKeysFile')
 const mask = require('../../lib/helpers/mask')
+const filterKeys = require('../../lib/helpers/filterKeys')
 
 async function get (key) {
   const options = normalizeDotenvConfigConvention(this.opts())
@@ -30,7 +31,7 @@ async function get (key) {
     const sesh = new Session()
     const noArmor = options.armor === false || (await sesh.noArmor())
     const noKeychain = options.native === false || options.noNative === true
-    const { parsed, errors } = await getResolver({
+    const { parsed: resolved, errors } = await getResolver({
       key,
       envs,
       overload: options.overload,
@@ -46,6 +47,7 @@ async function get (key) {
         }
       }
     })
+    const parsed = filterKeys(resolved, options.includeKey, options.excludeKey)
 
     for (const error of errors || []) {
       if (options.strict) throw error // throw immediately if strict

@@ -1849,6 +1849,30 @@ $ dotenvx get
 ```
 
 </details>
+<details><summary>`get -ik`</summary><br>
+
+Include only matching keys by passing `--include-key`. Glob patterns are supported.
+
+```sh
+$ echo "HELLO=World\nHOLA=Mundo\nGOODBYE=World" > .env
+
+$ dotenvx get -ik "H*"
+{"HELLO":"World","HOLA":"Mundo"}
+```
+
+</details>
+<details><summary>`get -ek`</summary><br>
+
+Exclude matching keys by passing `--exclude-key`. Glob patterns are supported.
+
+```sh
+$ echo "DOTENV_PUBLIC_KEY=public\nHELLO=World" > .env
+
+$ dotenvx get --format=eval-export -ek "DOTENV_PUBLIC_KEY*"
+export HELLO='World'
+```
+
+</details>
 <details><summary>`get --format shell`</summary><br>
 
 Return a shell formatted response of all key/value pairs in a `.env` file.
