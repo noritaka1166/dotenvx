@@ -44,7 +44,6 @@ async function resolveOnePassword (parsed, options = {}) {
       } catch (error) {
         errors.push(resolutionError(key, error))
         unresolved.push(key)
-        delete parsed[key]
       }
     }
   } finally {
@@ -73,7 +72,6 @@ function resolveOnePasswordSync (parsed) {
     } catch (error) {
       errors.push(resolutionError(key, error))
       unresolved.push(key)
-      delete parsed[key]
     }
   }
 

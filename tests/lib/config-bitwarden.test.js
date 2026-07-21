@@ -37,6 +37,36 @@ t.test('config resolves bw:// values through the Bitwarden Password Manager CLI'
   ct.end()
 })
 
+t.test('config preserves spaces in a quoted human-readable Bitwarden item name', ct => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenvx-bitwarden-'))
+  const envFile = path.join(dir, '.env')
+  const bw = path.join(dir, process.platform === 'win32' ? 'bw.cmd' : 'bw')
+  const originalPath = process.env.PATH
+  const originalSession = process.env.BW_SESSION
+
+  fs.writeFileSync(envFile, 'PASSWORD="bw://My GitHub Account/password"\n')
+  fs.writeFileSync(bw, process.platform === 'win32'
+    ? '@echo off\r\nif not "%~3"=="My GitHub Account" exit /b 1\r\necho super-secret\r\n'
+    : '#!/bin/sh\n[ "$3" = "My GitHub Account" ] || exit 1\nprintf \'super-secret\\n\'\n')
+  fs.chmodSync(bw, 0o755)
+  process.env.PATH = `${dir}${path.delimiter}${originalPath || ''}`
+  process.env.BW_SESSION = 'test-session'
+
+  try {
+    const processEnv = {}
+    const result = dotenvx.config({ path: envFile, processEnv, quiet: true, strict: true })
+
+    ct.equal(result.parsed.PASSWORD, 'super-secret')
+    ct.equal(processEnv.PASSWORD, 'super-secret')
+  } finally {
+    process.env.PATH = originalPath
+    if (originalSession === undefined) delete process.env.BW_SESSION
+    else process.env.BW_SESSION = originalSession
+    fs.rmSync(dir, { recursive: true, force: true })
+  }
+  ct.end()
+})
+
 t.test('config leaves bw:// values unresolved with noBitwarden', ct => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dotenvx-bitwarden-'))
   const envFile = path.join(dir, '.env')
@@ -73,9 +103,9 @@ t.test('config reports a failed bw:// value and still loads the rest of the file
     const result = dotenvx.config({ path: envFile, processEnv, quiet: true })
 
     ct.equal(result.parsed.PLAIN, 'value')
-    ct.notOk(result.parsed.API_KEY)
+    ct.equal(result.parsed.API_KEY, `bw://${ITEM_ID}/password`)
     ct.equal(processEnv.PLAIN, 'value')
-    ct.notOk(processEnv.API_KEY)
+    ct.equal(processEnv.API_KEY, `bw://${ITEM_ID}/password`)
     ct.equal(result.error.code, 'BITWARDEN_FAILED')
   } finally {
     process.env.PATH = originalPath

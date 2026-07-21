@@ -106,14 +106,12 @@ async function injectEnv ({ env, overload, processEnv, envKeysFilepath, provider
     if (!no1Password) {
       const result = await resolveOnePassword(row.injected, { onStatus })
       row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
       Object.assign(row.parsed, row.injected)
     }
 
     if (!noBitwarden) {
       const passwordResult = await resolveBitwardenPassword(row.injected, { onStatus })
       row.errors.push(...passwordResult.errors)
-      for (const key of passwordResult.unresolved) delete row.parsed[key]
 
       Object.assign(row.parsed, row.injected)
     }
@@ -160,14 +158,12 @@ function injectEnvSync ({ env, overload, processEnv, envKeysFilepath, provider, 
     if (!no1Password) {
       const result = resolveOnePassword.sync(row.injected)
       row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
       Object.assign(row.parsed, row.injected)
     }
 
     if (!noBitwarden) {
       const passwordResult = resolveBitwardenPassword.sync(row.injected)
       row.errors.push(...passwordResult.errors)
-      for (const key of passwordResult.unresolved) delete row.parsed[key]
 
       Object.assign(row.parsed, row.injected)
     }
@@ -217,14 +213,12 @@ async function injectEnvFile ({ env, overload, processEnv, envKeysFilepath, prov
     if (!no1Password) {
       const result = await resolveOnePassword(row.injected, { onStatus })
       row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
       Object.assign(row.parsed, row.injected)
     }
 
     if (!noBitwarden) {
       const passwordResult = await resolveBitwardenPassword(row.injected, { onStatus })
       row.errors.push(...passwordResult.errors)
-      for (const key of passwordResult.unresolved) delete row.parsed[key]
 
       Object.assign(row.parsed, row.injected)
     }
@@ -278,14 +272,12 @@ function injectEnvFileSync ({ env, overload, processEnv, envKeysFilepath, provid
     if (!no1Password) {
       const result = resolveOnePassword.sync(row.injected)
       row.errors.push(...result.errors)
-      for (const key of result.unresolved) delete row.parsed[key]
       Object.assign(row.parsed, row.injected)
     }
 
     if (!noBitwarden) {
       const passwordResult = resolveBitwardenPassword.sync(row.injected)
       row.errors.push(...passwordResult.errors)
-      for (const key of passwordResult.unresolved) delete row.parsed[key]
 
       Object.assign(row.parsed, row.injected)
     }

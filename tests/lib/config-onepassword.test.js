@@ -73,9 +73,9 @@ t.test('config reports a failed op:// value and still loads the rest of the file
     const result = dotenvx.config({ path: envFile, processEnv, quiet: true })
 
     ct.equal(result.parsed.PLAIN, 'value')
-    ct.notOk(result.parsed.API_KEY)
+    ct.equal(result.parsed.API_KEY, 'op://vault/missing/password')
     ct.equal(processEnv.PLAIN, 'value')
-    ct.notOk(processEnv.API_KEY)
+    ct.equal(processEnv.API_KEY, 'op://vault/missing/password')
     ct.equal(result.error.code, '1PASSWORD_FAILED')
   } finally {
     process.env.PATH = originalPath

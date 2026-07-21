@@ -54,7 +54,7 @@ t.test('resolves op:// values synchronously without a shell', ct => {
   ct.end()
 })
 
-t.test('reports and omits a missing op CLI without exposing the reference', ct => {
+t.test('reports a missing op CLI and preserves the unresolved reference', ct => {
   const resolveOnePassword = proxyquire('../../../src/lib/helpers/resolveOnePassword', {
     child_process: {
       execFile: () => ct.fail('should not call execFile'),
@@ -69,7 +69,7 @@ t.test('reports and omits a missing op CLI without exposing the reference', ct =
   const parsed = { DATABASE_PASSWORD: 'op://private/reference', PLAIN: 'value' }
   const result = resolveOnePassword.sync(parsed)
 
-  ct.same(parsed, { PLAIN: 'value' })
+  ct.same(parsed, { DATABASE_PASSWORD: 'op://private/reference', PLAIN: 'value' })
   ct.same(result.unresolved, ['DATABASE_PASSWORD'])
   ct.match(result.errors[0], {
     code: '1PASSWORD_FAILED',

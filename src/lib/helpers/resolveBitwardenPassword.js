@@ -5,7 +5,6 @@ const createSpinner = require('./createSpinner')
 const createElapsedStatus = require('./createElapsedStatus')
 
 const FIELDS = new Set(['username', 'password', 'uri'])
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function execFileAsync (command, args, options) {
   return new Promise((resolve, reject) => {
@@ -21,9 +20,12 @@ function isSecretReference (value) {
 }
 
 function parseSecretReference (value) {
-  const [itemId, field, ...extra] = value.slice('bw://'.length).split('/')
+  const reference = value.slice('bw://'.length)
+  const separatorIndex = reference.lastIndexOf('/')
+  const item = reference.slice(0, separatorIndex)
+  const field = reference.slice(separatorIndex + 1)
 
-  if (!UUID.test(itemId) || !field || extra.length > 0) {
+  if (separatorIndex < 1 || !field) {
     throw new Error('invalid Bitwarden Password Manager reference')
   }
 
@@ -31,7 +33,7 @@ function parseSecretReference (value) {
     throw new Error(`unsupported Bitwarden Password Manager field ${field}`)
   }
 
-  return { itemId, field }
+  return { item, field }
 }
 
 async function session (options) {
@@ -105,10 +107,10 @@ async function resolveBitwardenPassword (parsed, options = {}) {
       if (!isSecretReference(value)) continue
 
       try {
-        const { itemId, field } = parseSecretReference(value)
+        const { item, field } = parseSecretReference(value)
         if (options.session) startStatus()
         const bwSession = await session(options)
-        const stdout = await execFileAsync('bw', ['get', field, itemId], {
+        const stdout = await execFileAsync('bw', ['get', field, item], {
           encoding: 'utf8',
           windowsHide: true,
           env: { ...process.env, BW_SESSION: bwSession }
@@ -117,7 +119,6 @@ async function resolveBitwardenPassword (parsed, options = {}) {
       } catch (error) {
         errors.push(resolutionError(key, error))
         unresolved.push(key)
-        delete parsed[key]
       }
     }
   } finally {
@@ -138,13 +139,13 @@ function resolveBitwardenPasswordSync (parsed) {
     if (!isSecretReference(value)) continue
 
     try {
-      const { itemId, field } = parseSecretReference(value)
+      const { item, field } = parseSecretReference(value)
       if (!process.env.BW_SESSION) {
         const error = new Error('Bitwarden Password Manager requires an unlocked BW_SESSION')
         error.code = 'BW_SESSION_MISSING'
         throw error
       }
-      const stdout = execFileSync('bw', ['get', field, itemId], {
+      const stdout = execFileSync('bw', ['get', field, item], {
         encoding: 'utf8',
         windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe']
@@ -153,7 +154,6 @@ function resolveBitwardenPasswordSync (parsed) {
     } catch (error) {
       errors.push(resolutionError(key, error))
       unresolved.push(key)
-      delete parsed[key]
     }
   }
 
