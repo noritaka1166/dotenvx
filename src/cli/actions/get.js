@@ -121,7 +121,6 @@ async function get (key) {
   } catch (error) {
     if (spinner) spinner.stop()
     if (error.code === 'PROMPT_CANCELLED') {
-      catchAndLog(error)
       process.exit(130)
       return
     }

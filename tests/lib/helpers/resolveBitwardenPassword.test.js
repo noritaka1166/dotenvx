@@ -126,7 +126,7 @@ t.test('propagates prompt cancellation without resolving it as a Bitwarden failu
   const resolveBitwardenPassword = proxyquire('../../../src/lib/helpers/resolveBitwardenPassword', {
     './prompts': {
       password: async () => {
-        const error = new Error('[PROMPT_CANCELLED] prompt cancelled')
+        const error = new Error('prompt cancelled')
         error.code = 'PROMPT_CANCELLED'
         throw error
       },

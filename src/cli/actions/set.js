@@ -40,7 +40,6 @@ async function set (key, value) {
       })
     } catch (error) {
       if (error.code === 'PROMPT_CANCELLED') {
-        catchAndLog(error)
         process.exit(130)
         return
       }

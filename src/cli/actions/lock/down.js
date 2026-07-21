@@ -61,7 +61,6 @@ async function down () {
     }
   } catch (error) {
     if (error.code === 'PROMPT_CANCELLED') {
-      logger.error(error.message)
       process.exit(130)
       return
     }

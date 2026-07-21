@@ -126,15 +126,6 @@ class Errors {
     return e
   }
 
-  promptCancelled () {
-    const code = 'PROMPT_CANCELLED'
-    const message = `[${code}] prompt cancelled`
-
-    const e = new Error(message)
-    e.code = code
-    return e
-  }
-
   invalidColor () {
     const code = 'INVALID_COLOR'
     const message = `[${code}] Invalid color ${this.color}`
