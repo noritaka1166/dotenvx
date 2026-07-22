@@ -1,13 +1,17 @@
 function normalizeDotenvConfigIgnore (
   /** @type {import('../main').DotenvConfigOptions} */ options
 ) {
-  if (process.env.DOTENV_CONFIG_IGNORE) {
-    const ignoreVariables = (process.env.DOTENV_CONFIG_IGNORE).split(',')
-    options.ignore ??= [] // Retain ignore from explicit arguments
-    options.ignore.push(...ignoreVariables)
-  }
+  const configIgnore = (process.env.DOTENV_CONFIG_IGNORE || '')
+    .split(',')
+    .map(code => code.trim())
+    .filter(Boolean)
 
-  return options
+  if (configIgnore.length < 1) return options
+
+  return {
+    ...options,
+    ignore: [...(options.ignore || []), ...configIgnore]
+  }
 }
 
 module.exports = normalizeDotenvConfigIgnore

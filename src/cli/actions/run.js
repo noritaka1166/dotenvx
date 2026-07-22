@@ -8,6 +8,7 @@ const createSpinner = require('../../lib/helpers/createSpinner')
 const Session = require('../../db/session')
 const normalizeDotenvConfigQuiet = require('../../lib/helpers/normalizeDotenvConfigQuiet')
 const normalizeDotenvConfigConvention = require('../../lib/helpers/normalizeDotenvConfigConvention')
+const normalizeDotenvConfigIgnore = require('../../lib/helpers/normalizeDotenvConfigIgnore')
 const buildCommandEnvs = require('../../lib/helpers/buildCommandEnvs')
 const resolveEnvKeysFile = require('../../lib/helpers/resolveEnvKeysFile')
 const mask = require('../../lib/helpers/mask')
@@ -53,7 +54,7 @@ function uniqueInjectedKeys (processedEnvs) {
 }
 
 async function run () {
-  const options = normalizeDotenvConfigConvention(normalizeDotenvConfigQuiet(this.opts()))
+  const options = normalizeDotenvConfigIgnore(normalizeDotenvConfigConvention(normalizeDotenvConfigQuiet(this.opts())))
   const spinnerOptions = typeof this.optsWithGlobals === 'function' ? this.optsWithGlobals() : options
   const maskEnabled = options.mask !== undefined
   const redactEnabled = options.redact === true

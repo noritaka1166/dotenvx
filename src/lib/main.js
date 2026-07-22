@@ -320,6 +320,7 @@ const set = async function (key, value, options = {}) {
 /* @type {import('./main').get} */
 const get = async function (key, options = {}) {
   options = normalizeDotenvConfigConvention(options)
+  options = normalizeDotenvConfigIgnore(options)
 
   const envs = buildEnvs(options)
   const noArmor = resolveNoArmor(options)

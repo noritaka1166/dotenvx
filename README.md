@@ -3507,6 +3507,7 @@ There are global settings available that can be configured as environment variab
 ```ini
 # dotenvx native settings
 DOTENV_CONFIG_CONVENTION= # set to a default convention like 'nextjs' or 'flow'
+DOTENV_CONFIG_IGNORE= # MISSING_ENV_FILE,OTHER
 DOTENV_CONFIG_QUIET= # set to "true" to default to --quiet
 DOTENVX_NO_ARMOR= # set to "true" to turn off Armor support
 DOTENVX_NO_1PASSWORD= # set to "true" to turn off 1Password support

@@ -6,13 +6,14 @@ const createSpinner = require('../../lib/helpers/createSpinner')
 const Session = require('../../db/session')
 const getResolver = require('./../../lib/resolvers/get')
 const normalizeDotenvConfigConvention = require('../../lib/helpers/normalizeDotenvConfigConvention')
+const normalizeDotenvConfigIgnore = require('../../lib/helpers/normalizeDotenvConfigIgnore')
 const buildCommandEnvs = require('../../lib/helpers/buildCommandEnvs')
 const resolveEnvKeysFile = require('../../lib/helpers/resolveEnvKeysFile')
 const mask = require('../../lib/helpers/mask')
 const filterKeys = require('../../lib/helpers/filterKeys')
 
 async function get (key) {
-  const options = normalizeDotenvConfigConvention(this.opts())
+  const options = normalizeDotenvConfigIgnore(normalizeDotenvConfigConvention(this.opts()))
   const spinnerOptions = typeof this.optsWithGlobals === 'function' ? this.optsWithGlobals() : options
   const spinner = await createSpinner({ ...spinnerOptions, ...options, text: 'decrypting' })
 
