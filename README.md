@@ -3493,6 +3493,8 @@ Set `mask: 0` to fully mask values.
 
 There are global settings available that can be configured as environment variables.
 
+<details><summary>Environment variables</summary><br>
+
 ```ini
 # dotenvx native settings
 DOTENV_CONFIG_CONVENTION= # set to a default convention like 'nextjs' or 'flow'
@@ -3504,6 +3506,8 @@ DOTENVX_NO_BITWARDEN= # set to "true" to turn off Bitwarden support
 # other machine settings respected by dotenvx
 BW_SESSION= # set to bitwarden session token to bypass password prompt
 ```
+
+</details>
 
 &nbsp;
 
