@@ -3529,6 +3529,7 @@ BW_SESSION= # set to bitwarden session token to bypass password prompt
 * [Claude](https://dotenvx.com/docs/secrets-in-claude)
 * [Codex](https://dotenvx.com/docs/secrets-in-codex)
 * [1Password](https://dotenvx.com/docs/secrets-in-1password)
+* [Bitwarden](https://dotenvx.com/docs/secrets-in-bitwarden)
 * [Node.js](https://dotenvx.com/docs/secrets-in-nodejs)
 * [Next.js](https://dotenvx.com/docs/secrets-in-nextjs)
 * [Express](https://dotenvx.com/docs/secrets-in-express)
